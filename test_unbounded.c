@@ -30,6 +30,7 @@ void testPrintLong(long long a){
 		printf("%lld",*(tab+j));
 		j++;
 	}
+    printf("\n");
 }
 
 int main(void) {

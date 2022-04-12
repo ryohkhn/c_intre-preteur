@@ -1,3 +1,7 @@
 
-unbounded_int : unbounded_int.c unbounded_int.h test_unbounded.c
-	gcc -Wall -g -pedantic test_unbounded.c -o out/test_unbounded
+.PHONY: run
+run: test_unbounded
+	./out/test_unbounded
+
+test_unbounded : unbounded_int.h unbounded_int.c test_unbounded.c
+	gcc -Wall test_unbounded.c -o out/test_unbounded
