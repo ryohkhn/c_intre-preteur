@@ -63,9 +63,31 @@ char* unbounded_int2string(unbounded_int i){
     return res;
 }
 
-// todo je sais pas si on appelle ll2unbounded_int et ensuite la fonction qui compare deux unbounded_int entre eux (c'est un peu de l'arnaque)
 int unbounded_int_cmp_ll(unbounded_int a, long long b){
-    if(a.signe=='+' && b<0) return 1;
-    if(a.signe=='-' && b>0) return -1;
+    long long bCopy=b;
+    unsigned int bSize=1;
+    while(bCopy/=10) bSize++;
 
+    if((a.signe=='+' && b<0) || (a.len>bSize)) return 1;
+    if((a.signe=='-' && b>0) || (a.len<bSize)) return -1;
+
+    long long tab[bSize];
+    while(bSize--){
+        tab[b]=b%10;
+        b/=10;
+    }
+
+    chiffre* nextChiffre=a.premier;
+    int compt=0;
+    while(nextChiffre!=NULL){
+        if(*(tab+compt)>nextChiffre->c){
+            return -1;
+        }
+        else if(*(tab+compt)<nextChiffre->c){
+            return 1;
+        }
+        nextChiffre=nextChiffre->suivant;
+        compt++;
+    }
+    return 0;
 }
