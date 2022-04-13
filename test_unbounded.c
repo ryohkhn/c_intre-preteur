@@ -15,8 +15,7 @@ static void print_unbounded_int(const unbounded_int* s){
     printf("\n");
 }
 
-void testPrintLong(long long a){
-	int i=0;
+static void testPrintLong(long long a){
 	long long copy=a;
 	unsigned int ret=1;
 	while (copy/=10) ret++;
@@ -35,9 +34,13 @@ void testPrintLong(long long a){
 
 int main(void) {
     //char* s="-4543676543298";
-    //char* s="123";
-    //unbounded_int test1=string2unbounded_int(s);
+    char* s="12345";
+    unbounded_int test1=string2unbounded_int(s);
+	char* s2="123";
+	unbounded_int test2=string2unbounded_int(s);
     //print_unbounded_int(&test1);
     //printf("%s",unbounded_int2string(string2unbounded_int("-4543676543298")));
-	testPrintLong(1907803730928779);
+    //printf("%d\n",unbounded_int_cmp_ll(test1,1111));
+	unbounded_int res=unbounded_int_difference_a_b_positifs(test1,test2);
+	print_unbounded_int(&res);
 }

@@ -27,7 +27,7 @@ unbounded_int string2unbounded_int(const char* e){
         res.len=stringLen;
     }
     while(i<stringLen){
-        if(*(e+i)<48 || *(e+i)>57){
+        if((*(e+i)-'0')<0 || (*(e+i)-'0')>9){
             unbounded_int empty={.signe='*'};
             return empty;
         }
@@ -63,31 +63,92 @@ char* unbounded_int2string(unbounded_int i){
     return res;
 }
 
+
 int unbounded_int_cmp_ll(unbounded_int a, long long b){
     long long bCopy=b;
     unsigned int bSize=1;
     while(bCopy/=10) bSize++;
 
+    // test de signe et de longueur
     if((a.signe=='+' && b<0) || (a.len>bSize)) return 1;
     if((a.signe=='-' && b>0) || (a.len<bSize)) return -1;
 
+    // transformation du long long en tableau de long long unité par unité
     long long tab[bSize];
     while(bSize--){
-        tab[b]=b%10;
+        tab[bSize]=b%10;
         b/=10;
     }
 
     chiffre* nextChiffre=a.premier;
     int compt=0;
     while(nextChiffre!=NULL){
-        if(*(tab+compt)>nextChiffre->c){
+        if(*(tab+compt)>(nextChiffre->c)-'0'){
             return -1;
         }
-        else if(*(tab+compt)<nextChiffre->c){
+        else if(*(tab+compt)<(nextChiffre->c)-'0'){
             return 1;
         }
         nextChiffre=nextChiffre->suivant;
         compt++;
     }
     return 0;
+}
+
+// addition de deux unbounded_int positifs
+static unbounded_int unbounded_int_somme_a_b_positifis(unbounded_int a, unbounded_int b){
+
+}
+
+// soustraction a-b pour a et b positifs tels que a>=b
+static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbounded_int b){
+    chiffre* premier=malloc(sizeof(chiffre));
+    chiffre* dernier=malloc(sizeof(chiffre));
+    if(premier==NULL || dernier==NULL){
+        unbounded_int empty={.signe='*'};
+        return empty;
+    }
+    unbounded_int res={.signe='+',.premier=premier,.dernier=dernier};
+    int retenue=0;
+    int count=0;
+    chiffre* nextChiffre=res.dernier;
+    chiffre* nextChiffreA=a.dernier;
+    chiffre* nextChiffreB=b.dernier;
+    while(nextChiffreB!=NULL){
+        if((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue>=0){
+            nextChiffre->c=(char)(((a.dernier->c-'0')-(b.dernier->c-'0')+retenue)+'0');
+            retenue=0;
+        }
+        else{
+            nextChiffre->c=(char)(((a.dernier->c-'0')-(b.dernier->c-'0')+retenue+10)+'0');
+            retenue=-1;
+        }
+        if(count<b.len){
+            chiffre* next=malloc(sizeof(chiffre));
+            next->suivant=nextChiffre;
+            nextChiffre->precedent=next;
+        }
+        nextChiffre=nextChiffre->precedent;
+        nextChiffreB=nextChiffreB->precedent;
+        nextChiffreA=nextChiffreA->precedent;
+        count++;
+    }
+    count=0;
+    while(nextChiffreA!=NULL){
+        nextChiffre->c=nextChiffreA->c;
+        if(count<a.len){
+            chiffre* next=malloc(sizeof(chiffre));
+            next->suivant=nextChiffre;
+            nextChiffre->precedent=next;
+        }
+        nextChiffre=nextChiffre->precedent;
+        nextChiffreA=nextChiffreA->precedent;
+        count++;
+    }
+    res.premier=nextChiffre;
+    return res;
+}
+
+unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
+
 }

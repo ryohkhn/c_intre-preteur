@@ -26,11 +26,11 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b);
 /* renvoie la même chose que la fonction précédente, mais où le second argument est de type long long */
 int unbounded_int_cmp_ll(unbounded_int a, long long b);
 
-/* */
+/* renvoie la représentation de la somme de deux entiers représentés par a et b */
 unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b);
 
-/* */
+/* renvoie la représentation de leur différence */
 unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b);
 
-/* */
+/* renvoie la représentation de leur produit */
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b);
