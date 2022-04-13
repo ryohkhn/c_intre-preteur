@@ -34,10 +34,10 @@ static void testPrintLong(long long a){
 
 int main(void) {
     //char* s="-4543676543298";
-    char* s="12345";
+    char* s="12323424";
     unbounded_int test1=string2unbounded_int(s);
-	char* s2="123";
-	unbounded_int test2=string2unbounded_int(s);
+	char* s2="1";
+	unbounded_int test2=string2unbounded_int(s2);
     //print_unbounded_int(&test1);
     //printf("%s",unbounded_int2string(string2unbounded_int("-4543676543298")));
     //printf("%d\n",unbounded_int_cmp_ll(test1,1111));

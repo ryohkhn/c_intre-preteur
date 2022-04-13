@@ -7,13 +7,12 @@
 unbounded_int string2unbounded_int(const char* e){
     unsigned long stringLen=strlen(e);
     chiffre* premier=malloc(sizeof(chiffre));
-    chiffre* dernier=malloc(sizeof(chiffre));
-    if(premier==NULL || dernier==NULL || stringLen==0){
+    if(premier==NULL || stringLen==0){
         unbounded_int empty={.signe='*'};
         return empty;
     }
     chiffre* tmp;
-    unbounded_int res={.premier=premier,.dernier=dernier};
+    unbounded_int res={.premier=premier};
     int i=0;
     int signePresent=0;
     if(*(e)=='-' || *(e)=='+'){
@@ -33,7 +32,6 @@ unbounded_int string2unbounded_int(const char* e){
         }
         if((signePresent && i==1) || (!signePresent && i==0)){
             premier->c=*(e+i);
-            premier->precedent=NULL;
             tmp=premier;
         }
         else{
@@ -45,6 +43,7 @@ unbounded_int string2unbounded_int(const char* e){
         }
         i++;
     }
+    res.dernier=tmp;
     return res;
 }
 
@@ -102,18 +101,19 @@ static unbounded_int unbounded_int_somme_a_b_positifis(unbounded_int a, unbounde
 
 // soustraction a-b pour a et b positifs tels que a>=b
 static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbounded_int b){
-    chiffre* premier=malloc(sizeof(chiffre));
     chiffre* dernier=malloc(sizeof(chiffre));
-    if(premier==NULL || dernier==NULL){
+    if(dernier==NULL){
         unbounded_int empty={.signe='*'};
         return empty;
     }
-    unbounded_int res={.signe='+',.premier=premier,.dernier=dernier};
+    // création des pointeurs de chiffre pour avancer dans la structure
+    unbounded_int res={.signe='+',.dernier=dernier};
     int retenue=0;
     int count=0;
     chiffre* nextChiffre=res.dernier;
     chiffre* nextChiffreA=a.dernier;
     chiffre* nextChiffreB=b.dernier;
+    // boucle qui compare le chiffre A au B, sur toute la longueur de B
     while(nextChiffreB!=NULL){
         if((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue>=0){
             nextChiffre->c=(char)(((a.dernier->c-'0')-(b.dernier->c-'0')+retenue)+'0');
@@ -123,26 +123,28 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
             nextChiffre->c=(char)(((a.dernier->c-'0')-(b.dernier->c-'0')+retenue+10)+'0');
             retenue=-1;
         }
-        if(count<b.len){
+        // on se déplace au chiffre précédent seulement si on n'est pas au dernier chiffre de la valeur
+        if(count<b.len-1){
             chiffre* next=malloc(sizeof(chiffre));
             next->suivant=nextChiffre;
             nextChiffre->precedent=next;
+            nextChiffre=nextChiffre->precedent;
         }
-        nextChiffre=nextChiffre->precedent;
+        // on va sur le chiffre précédent de A et de B
         nextChiffreB=nextChiffreB->precedent;
         nextChiffreA=nextChiffreA->precedent;
+        res.len+=1;
         count++;
     }
-    count=0;
+    // boucle pour compléter le résultat, si A est plus grand que B
     while(nextChiffreA!=NULL){
-        nextChiffre->c=nextChiffreA->c;
-        if(count<a.len){
-            chiffre* next=malloc(sizeof(chiffre));
-            next->suivant=nextChiffre;
-            nextChiffre->precedent=next;
-        }
+        chiffre* next=malloc(sizeof(chiffre));
+        next->c=nextChiffreA->c;
+        next->suivant=nextChiffre;
+        nextChiffre->precedent=next;
         nextChiffre=nextChiffre->precedent;
         nextChiffreA=nextChiffreA->precedent;
+        res.len+=1;
         count++;
     }
     res.premier=nextChiffre;
