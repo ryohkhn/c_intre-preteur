@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -116,11 +115,11 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
     // boucle qui compare le chiffre A au B, sur toute la longueur de B
     while(nextChiffreB!=NULL){
         if((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue>=0){
-            nextChiffre->c=(char)(((a.dernier->c-'0')-(b.dernier->c-'0')+retenue)+'0');
+            nextChiffre->c=(char)(((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue)+'0');
             retenue=0;
         }
         else{
-            nextChiffre->c=(char)(((a.dernier->c-'0')-(b.dernier->c-'0')+retenue+10)+'0');
+            nextChiffre->c=(char)(((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue+10)+'0');
             retenue=-1;
         }
         // on se déplace au chiffre précédent seulement si on n'est pas au dernier chiffre de la valeur
@@ -139,7 +138,14 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
     // boucle pour compléter le résultat, si A est plus grand que B
     while(nextChiffreA!=NULL){
         chiffre* next=malloc(sizeof(chiffre));
-        next->c=nextChiffreA->c;
+        if((nextChiffreA->c-'0')+retenue>=0){
+            next->c=(char)(((nextChiffreA->c-'0')+retenue)+'0');
+            retenue=0;
+        }
+        else{
+            next->c=(char)(((nextChiffreA->c-'0')+retenue+10)+'0');
+            retenue=-1;
+        }
         next->suivant=nextChiffre;
         nextChiffre->precedent=next;
         nextChiffre=nextChiffre->precedent;
@@ -152,5 +158,29 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
 }
 
 unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
-
+    if(a.signe=='+' && b.signe=='+'){
+        return unbounded_int_difference_a_b_positifs(a,b);
+    }
+    if(a.signe=='-' && b.signe=='-'){
+        if(unbounded_int_cmp_unbounded_int(a,b)==-1){
+            a.signe='+';
+            b.signe='+';
+            unbounded_int res=unbounded_int_difference_a_b_positifs(a,b);
+            res.signe='-';
+            return res;
+        }
+        else{
+            a.signe='+';
+            b.signe='+';
+            return unbounded_int_difference_a_b_positifs(b,a);
+        }
+    }
+    if(a.signe=='+' && b.signe=='-'){
+        b.signe='-';
+        // appel de la somme
+    }
+    if(a.signe=='-' && b.signe=='+'){
+        a.signe='+';
+        // appel de la somme
+    }
 }
