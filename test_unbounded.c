@@ -43,6 +43,7 @@ int main(void) {
     //print_unbounded_int(&test1);
     //printf("%s",unbounded_int2string(string2unbounded_int("-4543676543298")));
     //printf("%d\n",unbounded_int_cmp_ll(test1,1111));
-	unbounded_int res=unbounded_int_difference(test1,test2);
-	print_unbounded_int(&res);
+	//unbounded_int res=unbounded_int_difference(test1,test2);
+	//print_unbounded_int(&res);
+	printf("cocuou");
 }

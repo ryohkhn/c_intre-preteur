@@ -61,6 +61,9 @@ char* unbounded_int2string(unbounded_int i){
     return res;
 }
 
+int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
+
+}
 
 int unbounded_int_cmp_ll(unbounded_int a, long long b){
     long long bCopy=b;

@@ -1,0 +1,4 @@
+/home/ryoh/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/221.5080.93/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/ryoh/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/221.5080.93/bin/ninja/linux/ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -G Ninja -S /home/ryoh/Cours/2021/PROJET/c_intre-preteur -B /home/ryoh/Cours/2021/PROJET/c_intre-preteur/cmake-build-debug
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/ryoh/Cours/2021/PROJET/c_intre-preteur/cmake-build-debug
