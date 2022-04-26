@@ -33,10 +33,11 @@ static void testPrintLong(long long a){
 }
 
 int main(void) {
+
     //char* s="-4543676543298";
     //char* s="157863980";
-	char* s="-198888321";
-	char* s2="-822332442";
+	char* s2="1456";
+	char* s="82345";
 	unbounded_int test1=string2unbounded_int(s);
 	//char* s2="8973882";
 	unbounded_int test2=string2unbounded_int(s2);
@@ -44,6 +45,15 @@ int main(void) {
     //printf("%s",unbounded_int2string(string2unbounded_int("-4543676543298")));
     //printf("%d\n",unbounded_int_cmp_ll(test1,1111));
 	//unbounded_int res=unbounded_int_difference(test1,test2);
-	//print_unbounded_int(&res);
-	printf("cocuou");
+    print_unbounded_int(&test1);
+    //printf("%c test1.dernier.val\n", test1.dernier->c);
+    //printf("%c test1.premier.val\n", test1.premier->c);
+    unbounded_int res = unbounded_int_somme_a_b_positifs(test1,test2);
+	print_unbounded_int(&res);
+    /*
+    print_unbounded_int(&test1);
+    print_unbounded_int(&test2);
+    printf("%d",unbounded_int_cmp_unbounded_int(test1,test2));
+*/
+
 }

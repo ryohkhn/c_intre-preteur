@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "stdio.h"
 
 #include "unbounded_int.h"
 
@@ -46,6 +47,37 @@ unbounded_int string2unbounded_int(const char* e){
     return res;
 }
 
+unbounded_int ll2unbounded_int(long long i){
+    chiffre* premier = malloc(sizeof(chiffre));
+    chiffre* dernier = malloc(sizeof(chiffre));
+    chiffre* tmp = premier;
+    if(premier == NULL || dernier == NULL){
+        unbounded_int empty = {.signe='*'};
+        return empty;
+    }
+    unbounded_int res={.premier=premier,.dernier=dernier};
+    if(i < 0){
+        res.signe = '-';
+    }else{
+        res.signe = '+';
+    }
+    i = llabs(i);
+    long long x = i;
+    do {
+        chiffre* nouveau = malloc(sizeof(chiffre));
+        if(x == i){ //first iteration
+            res.dernier = nouveau;
+        }
+        nouveau->c = i%10+'0';
+        nouveau->suivant = tmp;
+        tmp->precedent = nouveau;
+        tmp = nouveau;
+        res.len += 1;
+    }while(i /= 10);
+    res.premier = tmp;
+    return res;
+}
+
 
 char* unbounded_int2string(unbounded_int i){
     char* res=malloc(sizeof(char)*(i.len+2));
@@ -62,7 +94,28 @@ char* unbounded_int2string(unbounded_int i){
 }
 
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
+    if((a.signe == '+' && b.signe == '-') || (a.len > b.len)) return 1;
+    if((a.signe == '-' && b.signe == '+') || (a.len < b.len)) return -1;
 
+    chiffre * tempa = a.premier;
+    chiffre * tempb = b.premier;
+    if(a.signe == '+'){
+        while(tempa->suivant != NULL){
+            if(tempa->c < tempb->c) return -1;
+            if(tempa->c > tempb->c) return 1;
+            tempa = tempa->suivant;
+            tempb = tempb->suivant;
+        }
+    }else{
+        while(tempa->suivant != NULL){
+            if(tempa->c > tempb->c) return -1;
+            if(tempa->c < tempb->c) return 1;
+            tempa = tempa->suivant;
+            tempb = tempb->suivant;
+        }
+    }
+
+    return 0;
 }
 
 int unbounded_int_cmp_ll(unbounded_int a, long long b){
@@ -97,8 +150,73 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b){
 }
 
 // addition de deux unbounded_int positifs
-static unbounded_int unbounded_int_somme_a_b_positifis(unbounded_int a, unbounded_int b){
+static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded_int b){
+    printf("%c a.dernier\n", a.dernier->c);
+    chiffre * dernier = malloc(sizeof(chiffre));
+    if(dernier == NULL){
+        unbounded_int empty = {.signe ='*'};
+        return empty;
+    }
+    // création des pointeurs de chiffre pour avancer dans la structure
+    unbounded_int res = {.signe = '+', .dernier = dernier};
+    chiffre * nextChiffreA = a.dernier;
+    chiffre * nextChiffreB = b.dernier;
+    chiffre * nextChiffre = malloc(sizeof(chiffre));
+    nextChiffre->c = ((nextChiffreA->c-'0' + nextChiffreB->c-'0') % 10)+'0';
+    int retenue = (nextChiffreA->c-'0' + nextChiffreB->c-'0')/10;
+    res.dernier = nextChiffre ;
 
+    // boucle qui compare le chiffre A au B, sur toute la longueur de B
+    printf("boucle 1: \n");
+    while(nextChiffreB != NULL && nextChiffreA != NULL) {
+        chiffre* next = malloc(sizeof(chiffre));
+
+        printf(" val A = %c val B = %c val res = %c retenue = %d\n",nextChiffreA->c, nextChiffreB->c, nextChiffre->c, retenue);
+        int add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
+        next->c = add % 10+'0';
+        retenue = add / 10;
+
+        next->suivant = nextChiffre;
+        nextChiffre->precedent = next;
+        nextChiffre = next;
+
+        nextChiffreA = nextChiffreA->precedent;
+        nextChiffreB = nextChiffreB->precedent;
+
+        res.len += 1;
+    }
+    printf("boucle 2: \n");
+    while(nextChiffreB != NULL){
+        chiffre* next = malloc(sizeof(chiffre));
+        printf(" val B = %c val res = %c retenue = %d\n", nextChiffreB->c, nextChiffre->c, retenue);
+        int add = nextChiffreB->c-'0' + retenue;
+        next->c = add % 10+'0';
+        retenue = add / 10;
+
+        next->suivant = nextChiffre;
+        nextChiffre->precedent = next;
+        nextChiffre = nextChiffre->precedent;
+
+        nextChiffreB = nextChiffreB->precedent;
+        res.len += 1;
+    }
+    printf("boucle 3: \n");
+    while(nextChiffreA != NULL){
+        chiffre* next = malloc(sizeof(chiffre));
+        printf(" val A = %c val res = %c retenue = %d\n",nextChiffreA->c, nextChiffre->c, retenue);
+        int add = nextChiffreA->c-'0' + retenue;
+        next->c = add % 10+'0';
+        retenue = add / 10;
+
+        next->suivant = nextChiffre;
+        nextChiffre->precedent = next;
+        nextChiffre = nextChiffre->precedent;
+
+        nextChiffreA= nextChiffreA->precedent;
+        res.len += 1;
+    }
+    res.premier = nextChiffre;
+    return res;
 }
 
 // soustraction a-b pour a et b positifs tels que a>=b
@@ -186,4 +304,6 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
         a.signe='+';
         // appel de la somme
     }
+    return a;     //todo supprimer cette ligne avant de rendre
+
 }
