@@ -151,7 +151,6 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b){
 
 // addition de deux unbounded_int positifs
 static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded_int b){
-    printf("%c a.dernier\n", a.dernier->c);
     chiffre * dernier = malloc(sizeof(chiffre));
     if(dernier == NULL){
         unbounded_int empty = {.signe ='*'};
@@ -167,11 +166,9 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     res.dernier = nextChiffre ;
 
     // boucle qui compare le chiffre A au B, sur toute la longueur de B
-    printf("boucle 1: \n");
     while(nextChiffreB != NULL && nextChiffreA != NULL) {
         chiffre* next = malloc(sizeof(chiffre));
 
-        printf(" val A = %c val B = %c val res = %c retenue = %d\n",nextChiffreA->c, nextChiffreB->c, nextChiffre->c, retenue);
         int add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
         next->c = add % 10+'0';
         retenue = add / 10;
@@ -185,10 +182,8 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
 
         res.len += 1;
     }
-    printf("boucle 2: \n");
     while(nextChiffreB != NULL){
         chiffre* next = malloc(sizeof(chiffre));
-        printf(" val B = %c val res = %c retenue = %d\n", nextChiffreB->c, nextChiffre->c, retenue);
         int add = nextChiffreB->c-'0' + retenue;
         next->c = add % 10+'0';
         retenue = add / 10;
@@ -200,10 +195,8 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
         nextChiffreB = nextChiffreB->precedent;
         res.len += 1;
     }
-    printf("boucle 3: \n");
     while(nextChiffreA != NULL){
         chiffre* next = malloc(sizeof(chiffre));
-        printf(" val A = %c val res = %c retenue = %d\n",nextChiffreA->c, nextChiffre->c, retenue);
         int add = nextChiffreA->c-'0' + retenue;
         next->c = add % 10+'0';
         retenue = add / 10;
@@ -217,6 +210,35 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     }
     res.premier = nextChiffre;
     return res;
+}
+
+/* renvoie la représentation de la somme de deux entiers représentés par a et b */
+unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b){
+    //printf("somme\n");
+    if(a.signe == '+' && b.signe == '+'){
+        //printf("a et b >= 0\n");
+        return unbounded_int_somme_a_b_positifs(a,b);
+    }
+    else if(a.signe == '-' && b.signe == '-'){
+        //printf("a et b < 0\n");
+
+        a.signe = '+';
+        b.signe = '+';
+        unbounded_int res = unbounded_int_somme_a_b_positifs(a,b);
+        res.signe = '-';
+        return res;
+    }
+    else if(a.signe == '+' && b.signe == '-'){
+        //printf("a >= 0 et b < 0\n");
+        b.signe = '+';
+        return unbounded_int_difference(a,b);
+    }
+    else{ //if(a.signe == '-' && b.signe == '+'){
+        //printf("a < 0 et b >= 0\n");
+
+        a.signe = '+';
+        return unbounded_int_difference(b,a);
+    }
 }
 
 // soustraction a-b pour a et b positifs tels que a>=b
@@ -279,31 +301,40 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
 }
 
 unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
+    //printf("difference\n");
     if(a.signe=='+' && b.signe=='+'){
-        return unbounded_int_difference_a_b_positifs(a,b);
-    }
-    if(a.signe=='-' && b.signe=='-'){
+        //printf("a et b >= 0\n");
         if(unbounded_int_cmp_unbounded_int(a,b)==-1){
-            a.signe='+';
-            b.signe='+';
-            unbounded_int res=unbounded_int_difference_a_b_positifs(a,b);
+            unbounded_int res=unbounded_int_difference_a_b_positifs(b,a);
             res.signe='-';
             return res;
-        }
-        else{
-            a.signe='+';
-            b.signe='+';
-            return unbounded_int_difference_a_b_positifs(b,a);
+        }else {
+            return unbounded_int_difference_a_b_positifs(a, b);
         }
     }
-    if(a.signe=='+' && b.signe=='-'){
-        b.signe='-';
-        // appel de la somme
-    }
-    if(a.signe=='-' && b.signe=='+'){
-        a.signe='+';
-        // appel de la somme
-    }
-    return a;     //todo supprimer cette ligne avant de rendre
+    else if(a.signe=='-' && b.signe=='-') {
+        //printf("a et b < 0\n");
+        a.signe = '+';
+        b.signe = '+';
+        if (unbounded_int_cmp_unbounded_int(a, b) == -1) { // si a > b APRES inversion des signes (donc a < b AVANT)
+            unbounded_int res = unbounded_int_difference_a_b_positifs(a, b);
+            res.signe = '-';
+            return res;
 
+        } else {
+            return unbounded_int_difference_a_b_positifs(b, a);
+        }
+    }
+    else if(a.signe=='+' && b.signe=='-'){
+        //printf("a >= 0 et b < 0\n");
+        b.signe='+';
+        return unbounded_int_somme_a_b_positifs(a,b);
+    }
+    else{  //if(a.signe=='-' && b.signe=='+'){
+        //printf("a < 0 et b >= 0\n");
+        a.signe='+';
+        unbounded_int res = unbounded_int_somme_a_b_positifs(a,b);
+        res.signe = '-';
+        return res;
+    }
 }
