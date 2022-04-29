@@ -338,3 +338,123 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
         return res;
     }
 }
+
+
+/* renvoie la représentation de leur produit */
+unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b){
+    chiffre * chiffreB = b.dernier;
+    int mult = 1;
+    chiffre * chif = malloc(sizeof(chiffre));
+    chif->c = '0';
+    unbounded_int res = {.signe = '+', 1,chif,chif};
+    printf("creation res a +0\n");
+    while(chiffreB != NULL){
+
+
+        //affichage res :
+        printf("res = ");
+
+        int i=0;
+        printf("%c",res.signe);
+        chiffre* tmp=res.premier;
+        while(i<res.len){
+            printf("%c",tmp->c);
+            if(tmp->suivant!=NULL){
+                tmp=tmp->suivant;
+            }
+            i++;
+        }
+        printf("\n");
+        //fin affichage res
+
+        printf("on créer value\n");
+        int value = (chiffreB->c-'0') * mult;
+        printf("on creer res2 \n");
+        unbounded_int res2 = produit_simple(a, value);
+
+
+        printf("res2 = ");
+
+        //affichage res2 :
+        printf("%c",res2.signe);
+        tmp=res2.premier;
+        i = 0;
+        while(i<res2.len){
+            printf("%c",tmp->c);
+            if(tmp->suivant!=NULL){
+                tmp=tmp->suivant;
+            }
+            i++;
+        }
+        printf("\n");
+        //fin affichage res2
+
+        printf("on fait la somme de res et res2 \n");
+        res = unbounded_int_somme(res, res2);
+
+        mult *= 10;
+        chiffreB = chiffreB->precedent;
+        printf("\n");
+
+    }
+    res.signe = (a.signe != b.signe)?'-':'+';
+    return res;
+}
+
+unbounded_int produit_simple(unbounded_int a, int value){
+    unbounded_int res = string2unbounded_int(unbounded_int2string(a));
+    if(value == 0){
+        chiffre * chif = malloc(sizeof(chiffre));
+        chif->c = '0';
+        unbounded_int zero = {.signe = '+', 1,chif,chif};
+        return zero;
+    }
+    if(value == 1) return res;
+    while(value > 9){
+        value /= 10;
+        chiffre * next = malloc(sizeof(chiffre));
+        next->c = '0';
+        next->precedent = res.dernier;
+        res.dernier->suivant = next;
+        res.dernier = next;
+        res.len += 1;
+
+    }
+    int retenue = 0;
+    chiffre * temp = res.dernier;
+    while(temp != NULL){
+        int calc = (((temp->c-'0') * value) + retenue) % 10;
+        retenue =  (((temp->c-'0') * value) + retenue) / 10;
+        temp->c = calc+'0' ;
+        temp = temp->precedent;
+    }
+    if(retenue != 0){
+        chiffre * first = malloc(sizeof(chiffre));
+        first->c = retenue+'0';
+        res.premier->precedent = first;
+        first->suivant = res.premier;
+        res.premier = first;
+        res.len += 1;
+    }
+
+
+    //printf("        avec produit de value = %d avec a = ", value);
+/*
+    //affichage res :
+    printf("%c",res.signe);
+    int i=0;
+    chiffre* tmp=res.premier;
+    while(i<res.len){
+        printf("%c",tmp->c);
+        if(tmp->suivant!=NULL){
+            tmp=tmp->suivant;
+        }
+        i++;
+    }
+    printf("\n");
+    //fin affichage res
+    */
+
+
+    return res;
+}

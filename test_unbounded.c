@@ -34,14 +34,16 @@ static void testPrintLong(long long a){
 
 int main(void) {
 
-    char* s="14561";
+    char* s="126";
     //char* s="157863980";
-	char* s2="-145699";
+	char* s2="2149";
 	//char* s="82345";
 	unbounded_int test1=string2unbounded_int(s);
 	//char* s2="8973882";
 	unbounded_int test2=string2unbounded_int(s2);
+    printf("a = ");
     print_unbounded_int(&test1);
+    printf("b = ");
     print_unbounded_int(&test2);
 
     //print_unbounded_int(&test1);
@@ -50,7 +52,8 @@ int main(void) {
 	//unbounded_int res=unbounded_int_difference(test1,test2);
     //printf("%c test1.dernier.val\n", test1.dernier->c);
     //printf("%c test1.premier.val\n", test1.premier->c);
-    unbounded_int res = unbounded_int_somme(test1,test2);
+    unbounded_int res = unbounded_int_produit(test1,test2);
+    printf("res = ");
 	print_unbounded_int(&res);
     /*
     print_unbounded_int(&test1);
