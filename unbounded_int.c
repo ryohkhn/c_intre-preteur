@@ -356,7 +356,11 @@ unbounded_int unbounded_int_produit2(unbounded_int a, unbounded_int b) {
         mult *= 10;
         chiffreB = chiffreB->precedent;
     }
+    res.signe = (a.signe != b.signe)?'-':'+';
+    return res;
 }
+
+
 /* renvoie la représentation de leur produit */
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b){
     chiffre * chiffreB = b.dernier;
