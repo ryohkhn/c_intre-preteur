@@ -339,7 +339,24 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
     }
 }
 
-
+/* renvoie la représentation de leur produit
+ * Même fonction que celle de base, mais sans les affichages (pour simplifier sa compréhension)
+ *
+ */
+unbounded_int unbounded_int_produit2(unbounded_int a, unbounded_int b) {
+    chiffre * chiffreB = b.dernier;
+    int mult = 1;
+    chiffre * chif = malloc(sizeof(chiffre));
+    chif->c = '0';
+    unbounded_int res = {.signe = '+', 1,chif,chif};
+    while(chiffreB != NULL){
+        int value = (chiffreB->c-'0') * mult;
+        unbounded_int res2 = produit_simple(a, value);
+        res = unbounded_int_somme(res, res2);
+        mult *= 10;
+        chiffreB = chiffreB->precedent;
+    }
+}
 /* renvoie la représentation de leur produit */
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b){
     chiffre * chiffreB = b.dernier;
