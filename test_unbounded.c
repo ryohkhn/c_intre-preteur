@@ -25,7 +25,7 @@ static void testPrintLong(long long a){
 		a/=10;
 	}
 	int j=0;
-	while(j< sizeof(tab)/ sizeof(tab[0])){
+	while(j<sizeof(tab)/ sizeof(tab[0])){
 		printf("%lld",*(tab+j));
 		j++;
 	}
@@ -44,7 +44,7 @@ int main(void) {
     printf("a = ");
     print_unbounded_int(&test1);
     printf("b = ");
-    print_unbounded_int(&test2);
+	print_unbounded_int(&test2);
 
     //print_unbounded_int(&test1);
     //printf("%s",unbounded_int2string(string2unbounded_int("-4543676543298")));
@@ -52,7 +52,7 @@ int main(void) {
 	//unbounded_int res=unbounded_int_difference(test1,test2);
     //printf("%c test1.dernier.val\n", test1.dernier->c);
     //printf("%c test1.premier.val\n", test1.premier->c);
-    unbounded_int res = unbounded_int_produit(test1,test2);
+    unbounded_int res = unbounded_int_produit2(test1,test2);
     printf("res = ");
 	print_unbounded_int(&res);
     /*
@@ -61,4 +61,10 @@ int main(void) {
     printf("%d",unbounded_int_cmp_unbounded_int(test1,test2));
 */
 
+	//chiffre * chif = malloc(sizeof(chiffre));
+	//chif->c = '0';
+	//unbounded_int test3= {.signe = '+', 1,chif,chif};
+	//unbounded_int res2 = unbounded_int_somme(test2,test3);
+	//printf("res2 = ");
+	//print_unbounded_int(&res2);
 }

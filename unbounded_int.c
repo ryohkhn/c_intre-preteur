@@ -164,13 +164,16 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     nextChiffre->c = ((nextChiffreA->c-'0' + nextChiffreB->c-'0') % 10)+'0';
     int retenue = (nextChiffreA->c-'0' + nextChiffreB->c-'0')/10;
     res.dernier = nextChiffre ;
+    nextChiffreA = nextChiffreA->precedent;
+    nextChiffreB = nextChiffreB->precedent;
+    res.len += 1;
 
     // boucle qui compare le chiffre A au B, sur toute la longueur de B
     while(nextChiffreB != NULL && nextChiffreA != NULL) {
         chiffre* next = malloc(sizeof(chiffre));
 
         int add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
-        next->c = add % 10+'0';
+        next->c = add % 10 + '0';
         retenue = add / 10;
 
         next->suivant = nextChiffre;
