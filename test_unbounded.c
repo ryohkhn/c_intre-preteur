@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "unbounded_int.c"
-
+#include "calc_unbounded_int.c"
 static void print_unbounded_int(const unbounded_int* s){
 	printf("%c",s->signe);
 	int i=0;
@@ -52,7 +52,7 @@ int main(void) {
 	//unbounded_int res=unbounded_int_difference(test1,test2);
     //printf("%c test1.dernier.val\n", test1.dernier->c);
     //printf("%c test1.premier.val\n", test1.premier->c);
-    unbounded_int res = unbounded_int_produit2(test1,test2);
+    unbounded_int res = unbounded_int_produit(test1,test2);
     printf("res = ");
 	print_unbounded_int(&res);
     /*

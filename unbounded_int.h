@@ -34,8 +34,3 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b);
 
 /* renvoie la représentation de leur produit */
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b);
-
-/* fonction auxilliaire pour le produit. Renvoie le produit d'un unbounded_int par une valeur */
-unbounded_int produit_simple(unbounded_int a, int value);
-
-unbounded_int unbounded_int_produit2(unbounded_int a, unbounded_int b); // todo a supprimer (pour les tests)
