@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "unbounded_int.c"
+
 /*
  * https://developpement-informatique.com/article/215/lire-et-ecrire-dans-un-fichier-en-langage-c
  * Pour des renseignements sur comment lire et écrire dans des fichiers.
  */
 
-char * printValue(char * s, FILE * temp, FILE * output){
+typedef struct variable{
+    char* nom;
+    unbounded_int valeur;
+}variable;
+
+char * printValue(char * s, variable* liste, FILE * output){
     while(*s == ' '){
         s++;
     }
@@ -21,7 +28,7 @@ char * printValue(char * s, FILE * temp, FILE * output){
                     exit(EXIT_FAILURE);
                 }
                 else if(*s <= '0' || *s >= '9'){
-                    printf("Erreur dans le fichier. Le nombre a afficher est coupé par un caractere qui n'est pas un chiffre.\n")
+                    printf("Erreur dans le fichier. Le nombre a afficher est coupé par un caractere qui n'est pas un chiffre.\n");
                     exit(EXIT_FAILURE);
                 }
             }
@@ -30,11 +37,11 @@ char * printValue(char * s, FILE * temp, FILE * output){
         return s;
     }
     else if ((*s >= 'a' && *s <= 'z') || (*s >= 'A' && *s <= 'Z')){
-        fputs(getVariableFromTemp(s, temp), output);
+        //fputs(getVariableFromTemp(s, temp), output);
     }
 }
 
-void interpreterLineByLine(FILE * source, FILE * temp, char c){
+void interpreterLineByLine(FILE * source, variable* liste, char c){
     int startVariable = 0;
     char * isPrint = malloc(sizeof(char) * 5);
     int printAlreadyVerified = 0;
@@ -61,7 +68,7 @@ void interpreterLineByLine(FILE * source, FILE * temp, char c){
                 while(c == ' '){
                     c = fgetc(source);
                 }
-                printValue(fgets(source), temp);
+                //printValue(fgets(source),liste,source);
             }
         }
         c = fgetc(source);
@@ -70,10 +77,45 @@ void interpreterLineByLine(FILE * source, FILE * temp, char c){
 
 void interpreter(FILE * source, FILE * output){
     // on lit le fichier source et on ré-écrit les variables dans un fichier temporaire
-    FILE * temp;
-    c = fgetc(source);
+    variable* liste= malloc(sizeof(variable));
+    int c = fgetc(source);
     while(c != EOF){ // on interprete ligne par ligne
-        interpreterLineByLine(source,temp, output, c);
+        //interpreterLineByLine(source,liste, output, c);
         c = fgetc(source);
+    }
+}
+
+int main(int argc,char* argv[]){
+    if(argc>5){
+        printf("Erreur: nombre d'arguments invalides");
+        return EXIT_FAILURE;
+    }
+
+    FILE* fichierEntree;
+    FILE* fichierSortie;
+    if(strcmp(argv[1],"-i")==0){
+        fichierEntree=fopen(argv[2],"r");
+        if(fichierEntree==NULL){
+            printf("Erreur \"%s\": chemin d'accès invalide",argv[2]);
+            return EXIT_FAILURE;
+        }
+        if(strcmp(argv[3],"-o")==0){
+            fichierSortie=fopen(argv[4],"w");
+            interpreter(fichierEntree,fichierSortie);
+        }
+        else{
+            interpreter(fichierEntree,stdout);
+        }
+    }
+    else if(strcmp(argv[1],"-o")==0){
+        fichierSortie=fopen(argv[2],"w");
+        if(fichierSortie==NULL){
+            printf("Erreur \"%s\": chemin d'accès invalide",argv[2]);
+            return EXIT_FAILURE;
+        }
+        interpreter(stdin,fichierSortie);
+    }
+    else{
+        interpreter(stdin,stdout);
     }
 }
