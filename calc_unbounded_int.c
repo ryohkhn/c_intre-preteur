@@ -13,7 +13,14 @@ typedef struct variable{
     unbounded_int valeur;
 }variable;
 
-char * printValue(char * s, variable* liste, FILE * output){
+void printError(char* errorMessage){
+    printf("Erreur: %s\n",errorMessage);
+    exit(EXIT_FAILURE);
+}
+
+char* printValue(char* var,char * ligne, variable* listeVar, FILE * output){
+    printf("Entrée dans print valeur, var=%s\n",var);
+    /*
     while(*s == ' '){
         s++;
     }
@@ -39,45 +46,63 @@ char * printValue(char * s, variable* liste, FILE * output){
     else if ((*s >= 'a' && *s <= 'z') || (*s >= 'A' && *s <= 'Z')){
         //fputs(getVariableFromTemp(s, temp), output);
     }
+     */
+}
+
+void attribuerValue(char* var,char* ligne,variable* listeVar){
+    printf("Entrée dans attribuer valeur, var=%s\n",var);
 }
 
 void interpreterLineByLine(FILE* source,FILE* sortie,variable* listeVar,char* ligne){
-    int startVariable = 0;
-    char * isPrint = malloc(sizeof(char) * 5);
-    int printAlreadyVerified = 0;
+    int tailleVar= 0;
     int compteur=0;
+    int foundSpace=0;
+    char* var= malloc(sizeof(char) * 5);
     char c=*ligne;
     while (c != EOF && c != '\n' ){ // on itere lettre par lettre jusqu'a reconnaitre une variable, un print ou une erreur.
-        if(c!=' '){
-            if (startVariable == 0) { // cas de la premiere lettre
+        if(tailleVar==0 && c==' '){ // cas des escapes avant la variable
+            compteur++;
+            c=*(ligne+compteur);
+        }
+        else{
+            if(tailleVar==0) { // cas de la premiere lettre
                 if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')){
-                    startVariable += 1;
+                    *var=c;
+                    tailleVar++;
                 }
                 else{
-                    printf("Erreur: La ligne ne commence pas par une lettre.\n");
-                    exit(EXIT_FAILURE);
+                    printError("la ligne ne commence pas par une lettre");
                 }
             }
-            else if(startVariable < 5) {
-                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-                    *isPrint++ = c;
-                    startVariable += 1;
+            else if(tailleVar==5){ // cas print
+                printf("\"%c\"",*(ligne+compteur));
+                if(strcmp(var, "print") == 0 && *(ligne+compteur)==' '){
+                    printValue(var,ligne,listeVar,sortie);
+                    return;
                 }
             }
-            else if(startVariable == 5 && printAlreadyVerified == 0){ // cas print
-                printAlreadyVerified = 1;
-                if(strcmp(isPrint, "print") == 0){
-                    c = fgetc(source);
-                    while(c == ' '){
-                        c = fgetc(source);
-                    }
-                    //printValue(fgets(source),liste,source);
-                }
+            else if(c=='='){ // cas attribution
+                attribuerValue(var,ligne,listeVar);
+                return;
             }
+            else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { // cas d'une lettre dans la variable
+                if(foundSpace){
+                    printError("espace invalide");
+                }
+                *(var+tailleVar)=c;
+                tailleVar++;
+            }
+            else if(c==' '){
+                foundSpace=1;
+            }
+            else{
+                printError("caractère invalide");
+            }
+            compteur++;
+            c=*(ligne+compteur);
         }
-        compteur++;
-        c=*(ligne+compteur);
     }
+    printf("Fin de ligne sans cas trouvé\n");
 }
 
 void interpreter(FILE* source, FILE* sortie){
@@ -88,6 +113,8 @@ void interpreter(FILE* source, FILE* sortie){
         interpreterLineByLine(source,sortie,listeVar,ligne);
     }
 }
+
+
 
 int main(int argc,char* argv[]){
     if(argc>5){
@@ -113,10 +140,6 @@ int main(int argc,char* argv[]){
     }
     else if(argc>1 && strcmp(argv[1],"-o")==0){
         fichierSortie=fopen(argv[2],"w");
-        if(fichierSortie==NULL){
-            printf("Erreur \"%s\": chemin d'accès invalide",argv[2]);
-            return EXIT_FAILURE;
-        }
         interpreter(stdin,fichierSortie);
     }
     else{
