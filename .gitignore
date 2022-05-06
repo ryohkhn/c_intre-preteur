@@ -1,4 +1,4 @@
 out/
 *.out
-cmake-build-debug
 CMakeLists.txt
+cmake-build-debug

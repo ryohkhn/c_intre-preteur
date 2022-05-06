@@ -41,47 +41,51 @@ char * printValue(char * s, variable* liste, FILE * output){
     }
 }
 
-void interpreterLineByLine(FILE * source, variable* liste, char c){
+void interpreterLineByLine(FILE* source,FILE* sortie,variable* listeVar,char* ligne){
     int startVariable = 0;
     char * isPrint = malloc(sizeof(char) * 5);
     int printAlreadyVerified = 0;
+    int compteur=0;
+    char c=*ligne;
     while (c != EOF && c != '\n' ){ // on itere lettre par lettre jusqu'a reconnaitre une variable, un print ou une erreur.
-        if (startVariable == 0) { // cas de la premiere lettre
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')){
-                startVariable += 1;
-            }
-            else{
-                printf("Erreur dans le fichier. La ligne ne commence pas par une lettre.\n");
-                exit(EXIT_FAILURE);
-
-            }
-        }
-        else if(startVariable < 5) {
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-                *isPrint++ = c;
-                startVariable += 1;
-            }
-        }else if(startVariable == 5 && printAlreadyVerified == 0){ // cas print
-            printAlreadyVerified = 1;
-            if(strcmp(isPrint, "print") == 0){
-                c = fgetc(source);
-                while(c == ' '){
-                    c = fgetc(source);
+        if(c!=' '){
+            if (startVariable == 0) { // cas de la premiere lettre
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')){
+                    startVariable += 1;
                 }
-                //printValue(fgets(source),liste,source);
+                else{
+                    printf("Erreur: La ligne ne commence pas par une lettre.\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if(startVariable < 5) {
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+                    *isPrint++ = c;
+                    startVariable += 1;
+                }
+            }
+            else if(startVariable == 5 && printAlreadyVerified == 0){ // cas print
+                printAlreadyVerified = 1;
+                if(strcmp(isPrint, "print") == 0){
+                    c = fgetc(source);
+                    while(c == ' '){
+                        c = fgetc(source);
+                    }
+                    //printValue(fgets(source),liste,source);
+                }
             }
         }
-        c = fgetc(source);
+        compteur++;
+        c=*(ligne+compteur);
     }
 }
 
-void interpreter(FILE * source, FILE * output){
-    // on lit le fichier source et on ré-écrit les variables dans un fichier temporaire
-    variable* liste= malloc(sizeof(variable));
-    int c = fgetc(source);
-    while(c != EOF){ // on interprete ligne par ligne
-        //interpreterLineByLine(source,liste, output, c);
-        c = fgetc(source);
+void interpreter(FILE* source, FILE* sortie){
+    variable* listeVar=malloc(sizeof(variable));
+    int taille_max=1024;
+    char* ligne=malloc(sizeof(char)*taille_max);
+    while(fgets(ligne,taille_max,source)!=0){
+        interpreterLineByLine(source,sortie,listeVar,ligne);
     }
 }
 
@@ -93,13 +97,13 @@ int main(int argc,char* argv[]){
 
     FILE* fichierEntree;
     FILE* fichierSortie;
-    if(strcmp(argv[1],"-i")==0){
+    if(argc>1 && strcmp(argv[1],"-i")==0){
         fichierEntree=fopen(argv[2],"r");
         if(fichierEntree==NULL){
             printf("Erreur \"%s\": chemin d'accès invalide",argv[2]);
             return EXIT_FAILURE;
         }
-        if(strcmp(argv[3],"-o")==0){
+        if(argc>3 && strcmp(argv[3],"-o")==0){
             fichierSortie=fopen(argv[4],"w");
             interpreter(fichierEntree,fichierSortie);
         }
@@ -107,7 +111,7 @@ int main(int argc,char* argv[]){
             interpreter(fichierEntree,stdout);
         }
     }
-    else if(strcmp(argv[1],"-o")==0){
+    else if(argc>1 && strcmp(argv[1],"-o")==0){
         fichierSortie=fopen(argv[2],"w");
         if(fichierSortie==NULL){
             printf("Erreur \"%s\": chemin d'accès invalide",argv[2]);

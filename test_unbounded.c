@@ -15,22 +15,6 @@ static void print_unbounded_int(const unbounded_int* s){
     printf("\n");
 }
 
-static void testPrintLong(long long a){
-	long long copy=a;
-	unsigned int ret=1;
-	while (copy/=10) ret++;
-	long long tab[ret];
-	while(ret--){
-		tab[ret]=a%10;
-		a/=10;
-	}
-	int j=0;
-	while(j<sizeof(tab)/ sizeof(tab[0])){
-		printf("%lld",*(tab+j));
-		j++;
-	}
-    printf("\n");
-}
 
 int main(void) {
 
