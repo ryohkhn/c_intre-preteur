@@ -13,13 +13,28 @@ typedef struct variable{
     unbounded_int valeur;
 }variable;
 
+static size_t variable_array_size=1;
+static variable* listeVar;
+
+
 void printError(char* errorMessage){
     printf("Erreur: %s\n",errorMessage);
     exit(EXIT_FAILURE);
 }
 
-char* printValue(char* var,char * ligne, variable* listeVar, FILE * output){
-    printf("Entrée dans print valeur, var=%s\n",var);
+char *printValeur(char *ligne, FILE *output) {
+    //printf("Entrée dans print valeur");
+    char c=*ligne;
+    int compteur=0;
+    int foundSpace=0;
+    while(c==' '){
+        compteur++;
+        c=*(ligne+compteur);
+    }
+    while(c!=EOF && c!='\n'){
+        compteur++;
+        c=*(ligne+compteur);
+    }
     /*
     while(*s == ' '){
         s++;
@@ -49,15 +64,22 @@ char* printValue(char* var,char * ligne, variable* listeVar, FILE * output){
      */
 }
 
-void attribuerValue(char* var,char* ligne,variable* listeVar){
-    printf("Entrée dans attribuer valeur, var=%s\n",var);
+void attribuerValeur(char *var, char *ligne) {
+    //printf("Entrée dans attribuer valeur, var=%s\n",var);
+    char c=*ligne;
+    int compteur=0;
+    while(c!=EOF && c!='\n'){
+        compteur++;
+        c=*(ligne+compteur);
+    }
 }
 
-void interpreterLineByLine(FILE* source,FILE* sortie,variable* listeVar,char* ligne){
+void interpreterLineByLine(FILE *source, FILE *sortie, char *ligne) {
     int tailleVar= 0;
+    int tailleVarInitiale=5;
     int compteur=0;
     int foundSpace=0;
-    char* var= malloc(sizeof(char) * 5);
+    char* var=malloc(sizeof(char)*tailleVarInitiale);
     char c=*ligne;
     while (c != EOF && c != '\n' ){ // on itere lettre par lettre jusqu'a reconnaitre une variable, un print ou une erreur.
         if(tailleVar==0 && c==' '){ // cas des escapes avant la variable
@@ -65,6 +87,10 @@ void interpreterLineByLine(FILE* source,FILE* sortie,variable* listeVar,char* li
             c=*(ligne+compteur);
         }
         else{
+            if(tailleVar==tailleVarInitiale){
+                tailleVarInitiale*=2;
+                var=realloc(var,sizeof(char)*tailleVarInitiale);
+            }
             if(tailleVar==0) { // cas de la premiere lettre
                 if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')){
                     *var=c;
@@ -74,23 +100,22 @@ void interpreterLineByLine(FILE* source,FILE* sortie,variable* listeVar,char* li
                     printError("la ligne ne commence pas par une lettre");
                 }
             }
-            else if(tailleVar==5){ // cas print
-                printf("\"%c\"",*(ligne+compteur));
-                if(strcmp(var, "print") == 0 && *(ligne+compteur)==' '){
-                    printValue(var,ligne,listeVar,sortie);
-                    return;
-                }
-            }
-            else if(c=='='){ // cas attribution
-                attribuerValue(var,ligne,listeVar);
-                return;
-            }
             else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { // cas d'une lettre dans la variable
                 if(foundSpace){
                     printError("espace invalide");
                 }
                 *(var+tailleVar)=c;
                 tailleVar++;
+            }
+            else if(tailleVar==5){ // cas print
+                if(strcmp(var, "print") == 0 && *(ligne+compteur)==' '){
+                    printValeur(ligne+compteur+1, sortie);
+                    return;
+                }
+            }
+            else if(c=='='){ // cas attribution
+                attribuerValeur(var,ligne+compteur+1);
+                return;
             }
             else if(c==' '){
                 foundSpace=1;
@@ -106,11 +131,11 @@ void interpreterLineByLine(FILE* source,FILE* sortie,variable* listeVar,char* li
 }
 
 void interpreter(FILE* source, FILE* sortie){
-    variable* listeVar=malloc(sizeof(variable));
+    listeVar=malloc(sizeof(variable)*variable_array_size);
     int taille_max=1024;
     char* ligne=malloc(sizeof(char)*taille_max);
     while(fgets(ligne,taille_max,source)!=0){
-        interpreterLineByLine(source,sortie,listeVar,ligne);
+        interpreterLineByLine(source, sortie, ligne);
     }
 }
 
