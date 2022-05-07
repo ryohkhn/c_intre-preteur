@@ -23,7 +23,7 @@ char* unbounded_int2string(unbounded_int i);
 /* retourne une des valeurs −1, 0, 1 si, respectivement, a<b, a==b, a>b (ou a,b sont les entiers representés par a et b) */
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b);
 
-/* renvoie la même chose que la fonction précédente, mais où le second argument est de type long long */
+/* retourne une des valeurs −1, 0, 1 si, respectivement, a<b, a==b, a>b (ou a,b sont les entiers representés par a et b) */
 int unbounded_int_cmp_ll(unbounded_int a, long long b);
 
 /* renvoie la représentation de la somme de deux entiers représentés par a et b */
