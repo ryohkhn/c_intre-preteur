@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include "unbounded_int.c"
-#include "calc_unbounded_int.c"
 
 
 static void print_unbounded_int(const unbounded_int* s){
@@ -35,7 +34,8 @@ static void testPrintLong(long long a){
 	}
     printf("\n");
 }
-static char * randString(int length){
+
+static char* randString(int length){
     //srand ( time(NULL) );
     char * dictionnary = "0123456789";
     char * randomString = malloc(sizeof(char) * (length +2));
@@ -130,12 +130,9 @@ static void testUIcmpUI(){
             }
 
             // test equals unbounded int and long long
-            if(unbounded_int_cmp_ll(ui1, base) == 0){
+            int result_unbounded_int_cmp_ll= unbounded_int_cmp_ll(ui1,base);
+            if(result_unbounded_int_cmp_ll == 0){
                 grade_ui_llTrue += 1;
-            }else{
-                print_unbounded_int(&ui1);
-                printf("%lld\n",base);
-                printf("comp = %d\n\n",unbounded_int_cmp_ll(ui1, base));
             }
 
             // test sign unbounded int
@@ -164,11 +161,12 @@ static void testUIcmpUI(){
             }
 
             // test non equals unbounded int
-            int result_cmp = unbounded_int_cmp_unbounded_int(ui1,ui4);
-            if(result_cmp != 0){
-                if(base > base3 && result_cmp == 1){
+            int result_cmp_ui_ui = unbounded_int_cmp_unbounded_int(ui1,ui4);
+            if(result_cmp_ui_ui != 0){
+                if(base > base3 && result_cmp_ui_ui == 1){
                     gradeFalse += 1;
-                }else if(base < base3 && result_cmp == -1){
+                }
+                else if(base < base3 && result_cmp_ui_ui == -1){
                     gradeFalse += 1;
                 }
             }else{
@@ -189,18 +187,19 @@ static void testUIcmpUI(){
         }
     }
     printf("test comparison unbounded_int and unbounded_int : \n    "
-           "- comparison between two identical unbounded_int  %d/1000\n    "
-           "- comparison with only the sign varying %d/1000\n   "
-           "- comparison with two different unbounded_int %d/1000\n"
+           "- comparison between two identical unbounded_int  %d/100\n    "
+           "- comparison with only the sign varying %d/100\n   "
+           "- comparison with two different unbounded_int %d/100\n"
            ,gradeTrue,gradeSign,gradeFalse);
     printf("test comparison unbounded_int and long long : \n    "
-           "- comparison between two identical numbers  %d/1000\n    "
-           "- comparison with only the sign varying %d/1000\n   "
-           "- comparison with two different numbers %d/1000\n"
+           "- comparison between two identical numbers  %d/100\n    "
+           "- comparison with only the sign varying %d/100\n   "
+           "- comparison with two different numbers %d/100\n"
             ,grade_ui_llTrue,grade_ui_llSign,grade_ui_llFalse);
 }
 
 int main(void) {
+
 /*
     char* s="126";
     //char* s="157863980";
@@ -235,7 +234,7 @@ int main(void) {
 	//print_unbounded_int(&res2);
     */
 
-    testS2UI2S();
-    testll2UI();
+    //testS2UI2S();
+    //testll2UI();
     testUIcmpUI();
 }

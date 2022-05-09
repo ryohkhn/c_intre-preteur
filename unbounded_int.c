@@ -68,8 +68,10 @@ unbounded_int ll2unbounded_int(long long i){
         if(x == i){ //first iteration
             res.dernier = nouveau;
         }
+        else{
+            nouveau->suivant = tmp;
+        }
         nouveau->c = i%10+'0';
-        nouveau->suivant = tmp;
         tmp->precedent = nouveau;
         tmp = nouveau;
         res.len += 1;
@@ -98,7 +100,8 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
         if(b.signe == '-') return 1;
         if(a.len > b.len) return 1;
         if(a.len < b.len) return -1;
-    }else if(a.signe == '-'){
+    }
+    else if(a.signe == '-'){
         if(b.signe == '+') return -1;
         if(a.len > b.len) return -1;
         if(a.len < b.len) return 1;
@@ -111,14 +114,14 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
     chiffre * tempa = a.premier;
     chiffre * tempb = b.premier;
     if(a.signe == '+'){
-        while(tempa->suivant != NULL){
+        while(tempa!= NULL){
             if(tempa->c < tempb->c) return -1;
             if(tempa->c > tempb->c) return 1;
             tempa = tempa->suivant;
             tempb = tempb->suivant;
         }
     }else{
-        while(tempa->suivant != NULL){
+        while(tempa!= NULL){
             if(tempa->c > tempb->c) return -1;
             if(tempa->c < tempb->c) return 1;
             tempa = tempa->suivant;
@@ -132,28 +135,28 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
 int unbounded_int_cmp_ll(unbounded_int a, long long b){
     long long bCopy=b;
     unsigned int bSize=1;
+    // calcul de la taille de b
     while(bCopy/=10) bSize++;
-
-
 
     // test de signe et de longueur
     if(a.signe == '+'){
         if(b < 0) return 1;
         if(a.len > bSize) return 1;
         if(a.len < bSize) return -1;
-    }else if(a.signe == '-'){
-        if(b >= 0) return -1;
+    }
+    else if(a.signe == '-'){
+        if(b > 0) return -1;
         if(a.len > bSize) return -1;
         if(a.len < bSize) return 1;
     }
 
-
-    if(b < 0){
-        b *= -1;
+    // on met le long long en positif s'il est négatif pour permettre la comparaison chiffre par chiffre
+    if(b<0){
+        b*=-1;
     }
 
     // transformation du long long en tableau de long long unité par unité
-    long long * tab = malloc(sizeof(long long) * bSize);
+    long long tab[bSize];
     while(bSize--){
         tab[bSize]=b%10;
         b/=10;
@@ -161,34 +164,25 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b){
 
     chiffre* nextChiffre=a.premier;
     int compt=0;
-    if(a.signe == '+') {
-        while (nextChiffre != NULL) {
-            if (tab[compt] > ((nextChiffre->c) - '0')) {
-                printf("return n°1 avec %lld vs %d\n",tab[compt],((nextChiffre->c) - '0'));
-
-                return -1;
-            } else if (tab[compt] < ((nextChiffre->c) - '0')) {
-                printf("return 2\n");
-
-                return 1;
-            }
-            nextChiffre = nextChiffre->suivant;
-            compt++;
-        }
-    }else{
-        while (nextChiffre != NULL) {
-            if (tab[compt] > ((nextChiffre->c) - '0')) {
-                printf("return 3\n");
-
-                return 1;
-            } else if (tab[compt] < ((nextChiffre->c) - '0')) {
-                printf("return 4\n");
-
+    while(nextChiffre!=NULL){
+        if(a.signe=='+'){
+            if(*(tab+compt)>(nextChiffre->c)-'0'){
                 return -1;
             }
-            nextChiffre = nextChiffre->suivant;
-            compt++;
+            else if(*(tab+compt)<(nextChiffre->c)-'0'){
+                return 1;
+            }
         }
+        else{
+            if(*(tab+compt)>(nextChiffre->c)-'0'){
+                return 1;
+            }
+            else if(*(tab+compt)<(nextChiffre->c)-'0'){
+                return -1;
+            }
+        }
+        nextChiffre=nextChiffre->suivant;
+        compt++;
     }
     return 0;
 }

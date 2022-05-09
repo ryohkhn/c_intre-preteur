@@ -22,47 +22,71 @@ void printError(char* errorMessage){
     exit(EXIT_FAILURE);
 }
 
-char *printValeur(char *ligne, FILE *output) {
-    //printf("Entrée dans print valeur");
-    char c=*ligne;
+variable* getVariable(char* var){
+    for (int i = 0; i < variable_array_size; i++) {
+        if((listeVar+i)->nom!=NULL){
+            if(strcmp(((listeVar+i)->nom),var)==0){
+                return (listeVar+i);
+            }
+        }
+
+    }
+    return NULL;
+}
+
+char* printValeur(char *ligne, FILE *output) {
+    int tailleMalloc=1;
+    int tailleVar=0;
     int compteur=0;
     int foundSpace=0;
-    while(c==' '){
+    char* var=malloc(sizeof(char)*tailleMalloc);
+    char c=*ligne;
+    char* stringOutput;
+    variable* tmpVar;
+
+    while(c==' '){ // on avance dans la ligne tant qu'il s'agit d'un espace
         compteur++;
         c=*(ligne+compteur);
     }
+
     while(c!=EOF && c!='\n'){
+        if(c==' '){ // cas d'un espace dans la ligne
+            foundSpace=1;
+        }
+        else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { // cas d'une lettre dans la variable
+            if (foundSpace) { // si un espace a déjà été trouvé après un caractère, à l'encontre d'un nouveau caractère on provoque une erreur
+                printError("espace invalide dans le print");
+            }
+            if(tailleVar==tailleMalloc){ // agrandissement de la mémoire pour stocker le nom de la variable
+                tailleMalloc*=2;
+                var=realloc(var,sizeof(char)*tailleMalloc);
+            }
+            *(var+tailleVar)=c;
+            tailleVar++;
+        }
         compteur++;
         c=*(ligne+compteur);
     }
-    /*
-    while(*s == ' '){
-        s++;
+
+    // récupération de notre pointeur de structure si la variable existe
+    tmpVar=getVariable(var);
+
+    if(tmpVar!=NULL){ // cas ou la variable existe
+        char* tmpVarValeur=unbounded_int2string(tmpVar->valeur);
+        stringOutput=malloc(sizeof(char)*(strlen(tmpVarValeur)+strlen(tmpVar->nom)+4));
+        strcat(stringOutput,var);
+        strcat(stringOutput," = ");
+        strcat(stringOutput,tmpVarValeur);
+        strcat(stringOutput,"\n");
     }
-    if(*s >= '0' && *s <= '9'){
-        int isSpace = 0;
-        while(*s != '\0'){
-            if(*s == ' '){
-                isSpace = 1;
-            }else{
-                if(isSpace != 0){
-                    printf("Erreur dans le fichier. Il y a une tentative d'affichage d'un nombre coupé par un espace.\n");
-                    exit(EXIT_FAILURE);
-                }
-                else if(*s <= '0' || *s >= '9'){
-                    printf("Erreur dans le fichier. Le nombre a afficher est coupé par un caractere qui n'est pas un chiffre.\n");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            s++;
-        }
-        return s;
+    else{ // on affiche dans le fichier que la variable vaut 0 sinon
+        stringOutput=malloc(sizeof(char)* strlen(var)+5);
+        strcat(stringOutput,var);
+        strcat(stringOutput," = 0\n");
     }
-    else if ((*s >= 'a' && *s <= 'z') || (*s >= 'A' && *s <= 'Z')){
-        //fputs(getVariableFromTemp(s, temp), output);
-    }
-     */
+    fputs(stringOutput,output);
 }
+
 
 void attribuerValeur(char *var, char *ligne) {
     //printf("Entrée dans attribuer valeur, var=%s\n",var);
