@@ -319,6 +319,7 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
         res.len+=1;
         count++;
     }
+
     // boucle pour compléter le résultat, si A est plus grand que B
     while(nextChiffreA!=NULL){
         chiffre* next=malloc(sizeof(chiffre));
@@ -357,13 +358,14 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
         //printf("a et b < 0\n");
         a.signe = '+';
         b.signe = '+';
-        if (unbounded_int_cmp_unbounded_int(a, b) == -1) { // si a > b APRES inversion des signes (donc a < b AVANT)
-            unbounded_int res = unbounded_int_difference_a_b_positifs(a, b);
-            res.signe = '-';
+        if (unbounded_int_cmp_unbounded_int(a, b) == -1) { // si a < b APRES inversion des signes (donc a > b AVANT)
+            unbounded_int res = unbounded_int_difference_a_b_positifs(b, a);
             return res;
 
         } else {
-            return unbounded_int_difference_a_b_positifs(b, a);
+            unbounded_int res = unbounded_int_difference_a_b_positifs(a, b);
+            res.signe = '-';
+            return res;
         }
     }
     else if(a.signe=='+' && b.signe=='-'){
