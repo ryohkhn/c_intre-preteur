@@ -32,17 +32,19 @@ variable* getVariable(char* var){
     return NULL;
 }
 
-void checkStringSize(char* string,int tailleVar,size_t* tailleMalloc){
+char* checkStringSize(char* string,int tailleVar,size_t* tailleMalloc){
     if(tailleVar==*(tailleMalloc)){
         *(tailleMalloc)*=2;
         string=realloc(string,sizeof(char)*(*tailleMalloc));
     }
+    return string;
 }
 
 // met le caractère vide en fin de ligne et realloc le string à sa taille réelle
-void reallocToSize(char* string,int tailleString){
+char* reallocToSize(char* string,int tailleString){
     *(string+tailleString)='\0';
     string=realloc(string,sizeof(char)*tailleString);
+    return string;
 }
 
 void checkArraySize(){
@@ -78,7 +80,7 @@ char* printValeur(const char *ligne, FILE *output) {
                 printError("espace invalide dans le print");
             }
 
-            checkStringSize(var,tailleVar,tailleMalloc);
+            var=checkStringSize(var,tailleVar,tailleMalloc);
 
             *(var+tailleVar)=c;
             tailleVar++;
@@ -250,12 +252,12 @@ void attribuerValeur(char *var, const char *ligne) {
         else if(c=='+' || c=='-' || c=='*' || c=='/') {
             if (*(ligne + compteur + 1) >= '0' && *(ligne + compteur + 1) <= '9'){ // cas d'un entier signé
                 if(operateur==' '){
-                    checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
+                    firstVar=checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
                     *(firstVar+tailleFirstVar)=c;
                     tailleFirstVar++;
                 }
                 else{
-                    checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
+                    secondVar=checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
                     *(secondVar+tailleSecondVar)=c;
                     tailleSecondVar++;
                 }
@@ -281,12 +283,12 @@ void attribuerValeur(char *var, const char *ligne) {
 
             // agrandissement de la mémoire pour stocker le nom de la variable
             if(operateur==' '){
-                checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
+                firstVar=checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
                 *(firstVar+tailleFirstVar)=c;
                 tailleFirstVar++;
             }
             else{
-                checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
+                secondVar=checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
                 *(secondVar+tailleSecondVar)=c;
                 tailleSecondVar++;
             }
@@ -301,12 +303,12 @@ void attribuerValeur(char *var, const char *ligne) {
 
     if(tailleFirstVar!=0){
         if(tailleSecondVar!=0){
-            reallocToSize(secondVar,tailleSecondVar);
-            reallocToSize(firstVar,tailleFirstVar);
+            secondVar=reallocToSize(secondVar,tailleSecondVar);
+            firstVar=reallocToSize(firstVar,tailleFirstVar);
             attribuerValeurAvecOp(var,firstVar,operateur,secondVar);
         }
         else{
-            reallocToSize(firstVar,tailleFirstVar);
+            firstVar=reallocToSize(firstVar,tailleFirstVar);
             attribuerValeurSansOp(var,firstVar);
         }
     }
@@ -415,4 +417,9 @@ int main(int argc,char* argv[]){
     else{
         interpreter(stdin,stdout);
     }
+
+
+    /* TODO FREE ET FERMER LES FICHIERS A LA FIN DU MAIN ??
+     * TODO AJOUTER TESTS ERREUR MALLOC ET REALLOC
+     */
 }
