@@ -15,4 +15,4 @@ calc_unbounded : calc_unbounded_int.c unbounded_int.c
 	$(CC) $(CFLAGS) calc_unbounded_int.c -o out/calc_unbounded_int
 
 clean :
-	rm -r out/*
+	rm out/*

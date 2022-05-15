@@ -13,6 +13,7 @@ typedef struct variable{
     unbounded_int valeur;
 }variable;
 
+
 static size_t variable_array_size=1;
 static variable* listeVar;
 
@@ -34,7 +35,14 @@ variable* getVariable(char* var){
     return NULL;
 }
 
-char* printValeur(char *ligne, FILE *output) {
+void checkStringSize(char* string,int tailleVar,size_t* tailleMalloc){
+    if(tailleVar==*(tailleMalloc)){
+        *(tailleMalloc)*=2;
+        string=realloc(string,sizeof(char)*(*tailleMalloc));
+    }
+}
+
+char* printValeur(const char *ligne, FILE *output) {
     int tailleMalloc=1;
     int tailleVar=0;
     int compteur=0;
@@ -74,29 +82,97 @@ char* printValeur(char *ligne, FILE *output) {
     if(tmpVar!=NULL){ // cas ou la variable existe
         char* tmpVarValeur=unbounded_int2string(tmpVar->valeur);
         stringOutput=malloc(sizeof(char)*(strlen(tmpVarValeur)+strlen(tmpVar->nom)+4));
-        strcat(stringOutput,var);
-        strcat(stringOutput," = ");
-        strcat(stringOutput,tmpVarValeur);
-        strcat(stringOutput,"\n");
+        sprintf(stringOutput,"%s = %s\n",var,tmpVarValeur);
     }
     else{ // on affiche dans le fichier que la variable vaut 0 sinon
         stringOutput=malloc(sizeof(char)* strlen(var)+5);
-        strcat(stringOutput,var);
-        strcat(stringOutput," = 0\n");
+        sprintf(stringOutput,"%s = 0\n",var);
     }
     fputs(stringOutput,output);
 }
 
 
-void attribuerValeur(char *var, char *ligne) {
-    //printf("Entrée dans attribuer valeur, var=%s\n",var);
+void attribuerValeur(char *var, const char *ligne) {
+    size_t* tailleFirstMalloc=malloc(sizeof(size_t));
+    *tailleFirstMalloc=1;
+    size_t* tailleSecondMalloc=malloc(sizeof(size_t));
+    *tailleSecondMalloc=1;
+    int tailleFirstVar=0;
+    int tailleSecondVar=0;
+    int foundFirstSpace=0;
+    char* firstVar=malloc(sizeof(char)*(*tailleFirstMalloc));
+    char* secondVar=malloc(sizeof(char)*(*tailleSecondMalloc));
+    char operateur=' ';
     char c=*ligne;
     int compteur=0;
-    while(c!=EOF && c!='\n'){
+
+    while(c==' '){ // on avance dans la ligne tant qu'il s'agit d'un espace
         compteur++;
         c=*(ligne+compteur);
     }
+
+    while(c!=EOF && c!='\n'){
+        if(c==' '){ // cas d'un espace dans la ligne
+            foundFirstSpace=1;
+        }
+        else if(c=='+' || c=='-' || c=='*' || c=='/') {
+            if (foundFirstSpace == 0) {
+                printError("première variable manquante ou espace manquant autour de l'opérateur");
+            }
+            if (*(ligne + compteur + 1) >= '0' && *(ligne + compteur + 1) <= '9') {
+                if(operateur==' '){
+                    checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
+                    *(firstVar+tailleFirstVar)=c;
+                    tailleFirstVar++;
+                }
+                else{
+                    checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
+                    *(secondVar+tailleSecondVar)=c;
+                    tailleSecondVar++;
+                }
+            }
+            else if (*(ligne + compteur - 1) != ' ' || *(ligne + compteur + 1) != ' ') {
+                printError("espace manquant autour de l'opérateur, seconde variable manquante ou mauvais caractère");
+            }
+            else if (operateur != ' ') {
+                printError("un seul opérateur est requis");
+            }
+            else {
+                operateur = c;
+                compteur++; // on saute l'espace après l'opérateur
+            }
+        }
+        else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c<='9' && c>='0')) { // cas d'une lettre dans la variable
+            if (operateur==' ' && tailleFirstVar!=0) { // si un espace a déjà été trouvé après un caractère, à l'encontre d'un nouveau caractère on provoque une erreur
+                printError("opérateur manquant");
+            }
+
+            // agrandissement de la mémoire pour stocker le nom de la variable
+            if(operateur==' '){
+                checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
+                *(firstVar+tailleFirstVar)=c;
+                tailleFirstVar++;
+            }
+            else{
+                checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
+                *(secondVar+tailleSecondVar)=c;
+                tailleSecondVar++;
+            }
+        }
+        compteur++;
+        c=*(ligne+compteur);
+    }
+
+    if(tailleSecondVar==0 && operateur!=' '){
+        printError("seconde variable manquante");
+    }
+
+    printf("First var : %s\n",firstVar);
+    printf("Operator : %c\n",operateur);
+    printf("Second var : %s\n",secondVar);
 }
+
+
 
 void interpreterLineByLine(FILE *source, FILE *sortie, char *ligne) {
     int tailleVar= 0;
@@ -133,11 +209,17 @@ void interpreterLineByLine(FILE *source, FILE *sortie, char *ligne) {
             }
             else if(tailleVar==5){ // cas print
                 if(strcmp(var, "print") == 0 && *(ligne+compteur)==' '){
+                    // on realloc notre variable à sa taille réelle
+                    *(var+tailleVar)='\0';
+                    var=realloc(var,tailleVar);
                     printValeur(ligne+compteur+1, sortie);
                     return;
                 }
             }
             else if(c=='='){ // cas attribution
+                // on realloc notre variable à sa taille réelle
+                *(var+tailleVar)='\0';
+                var=realloc(var,tailleVar);
                 attribuerValeur(var,ligne+compteur+1);
                 return;
             }
@@ -151,7 +233,6 @@ void interpreterLineByLine(FILE *source, FILE *sortie, char *ligne) {
             c=*(ligne+compteur);
         }
     }
-    printf("Fin de ligne sans cas trouvé\n");
 }
 
 void interpreter(FILE* source, FILE* sortie){
