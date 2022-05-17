@@ -389,7 +389,7 @@ void interpreter(FILE* source, FILE* sortie){
 
 
 int main(int argc,char* argv[]){
-    if(argc>5){
+    if(argc>5 || argc<2){
         printf("Erreur: nombre d'arguments invalides");
         return EXIT_FAILURE;
     }
@@ -421,5 +421,6 @@ int main(int argc,char* argv[]){
 
     /* TODO FREE ET FERMER LES FICHIERS A LA FIN DU MAIN ??
      * TODO AJOUTER TESTS ERREUR MALLOC ET REALLOC
+     * TODO possible d'inverser -i et -o
      */
 }
