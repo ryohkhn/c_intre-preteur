@@ -305,8 +305,7 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
     }
     // création des pointeurs de chiffre pour avancer dans la structure
     unbounded_int res={.signe='+',.dernier=dernier};
-    int retenue=0;
-    int count=0;
+    int retenue,count=0;
     chiffre* nextChiffre=res.dernier;
     chiffre* nextChiffreA=a.dernier;
     chiffre* nextChiffreB=b.dernier;
@@ -396,6 +395,21 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b){
     }
 }
 
+static void print_unbounded_intt(const unbounded_int* s){
+    printf("%c",s->signe);
+    int i=0;
+    chiffre* tmp=s->premier;
+    while(i<s->len){
+        printf("%c",tmp->c);
+        if(tmp->suivant!=NULL){
+            tmp=tmp->suivant;
+        }
+        i++;
+    }
+    printf("\n");
+}
+
+
 /* fonction auxilliaire pour le produit. Renvoie le produit d'un unbounded_int par une valeur */
 static unbounded_int produit_simple(unbounded_int a, int value){
     unbounded_int res = string2unbounded_int(unbounded_int2string(a));
@@ -435,9 +449,11 @@ static unbounded_int produit_simple(unbounded_int a, int value){
 }
 
 /* renvoie le produit de a par b */
+
+/*
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     chiffre * chiffreB = b.dernier;
-    int mult = 1;
+    long long mult = 1;
     chiffre * chiffreInitial = malloc(sizeof(chiffre));
     chiffreInitial->c = '0';
     unbounded_int res = {.signe = '+', 1,chiffreInitial,chiffreInitial};
@@ -451,5 +467,72 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     res.signe = (a.signe != b.signe)?'-':'+';
     return res;
 }
+ */
 
+
+unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
+    unbounded_int res={.signe='+',.len=0};
+    chiffre* nextChiffreA;
+    chiffre* nextChiffreB=b.dernier;
+    chiffre* newChiffre;
+    int retenue;
+    int val;
+    int val2;
+
+    while(nextChiffreB!=NULL){
+        unbounded_int tmpRes={.signe='+',.len=0};
+        nextChiffreA=a.dernier;
+        retenue=0;
+        val=(nextChiffreB->c)-'0';
+
+        if(val==0){
+            nextChiffreB=nextChiffreB->precedent;
+            continue;
+        }
+
+        while(nextChiffreA!=NULL){
+            newChiffre=malloc(sizeof(chiffre));
+            val2=(nextChiffreA->c)-'0';
+
+            newChiffre->c=((val*val2+retenue)%10)+'0';
+            printf("%d",newChiffre->c);
+            if(tmpRes.len==0){
+                tmpRes.premier=newChiffre;
+                tmpRes.dernier=newChiffre;
+            }
+            else{
+                newChiffre->suivant=tmpRes.premier;
+                tmpRes.premier->precedent=newChiffre;
+                tmpRes.premier=newChiffre;
+            }
+            tmpRes.len++;
+
+            retenue=(val*val2+retenue)/10;
+            nextChiffreA=nextChiffreA->precedent;
+        }
+
+        if(retenue>0){
+            newChiffre= malloc(sizeof(chiffre));
+            newChiffre->c=retenue+'0';
+            if(tmpRes.len==0){
+                tmpRes.premier=newChiffre;
+                tmpRes.dernier=newChiffre;
+            }
+            else{
+                newChiffre->suivant=tmpRes.premier;
+                tmpRes.premier->precedent=newChiffre;
+                tmpRes.premier=newChiffre;
+            }
+            tmpRes.len++;
+        }
+
+        if(res.len!=0){
+            res=unbounded_int_somme(res,tmpRes);
+        }
+        else{
+            res=tmpRes;
+        }
+        nextChiffreB=nextChiffreB->precedent;
+    }
+}
 
