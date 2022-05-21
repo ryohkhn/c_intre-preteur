@@ -97,12 +97,18 @@ char* unbounded_int2string(unbounded_int i){
 
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
     if(a.signe == '+'){
-        if(b.signe == '-') return 1;
+        if(b.signe == '-'){
+            if(a.premier->c == '0' && b.premier->c == '0') return 0;
+            return 1;
+        }
         if(a.len > b.len) return 1;
         if(a.len < b.len) return -1;
     }
-    else if(a.signe == '-'){
-        if(b.signe == '+') return -1;
+    else if(a.signe == '-') {
+        if (b.signe == '+') {
+            if (a.premier->c == '0' && b.premier->c == '0') return 0;
+            return -1;
+        }
         if(a.len > b.len) return -1;
         if(a.len < b.len) return 1;
     }

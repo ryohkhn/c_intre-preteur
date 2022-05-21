@@ -3,7 +3,6 @@
 #include <time.h>
 #include "unbounded_int.c"
 
-
 static void print_unbounded_int(const unbounded_int* s){
 	printf("%c",s->signe);
 	int i=0;
@@ -16,6 +15,57 @@ static void print_unbounded_int(const unbounded_int* s){
 		i++;
 	}
     printf("\n");
+}
+
+static void test_specifics_values(){
+    unbounded_int a = string2unbounded_int("-9999999");
+    unbounded_int b = string2unbounded_int("9999999");
+    unbounded_int c = string2unbounded_int("0");
+    unbounded_int d = string2unbounded_int("-0");
+
+    printf("Test comparison unbounded_int / unbounded_int with basics values\n");
+    printf("    -9999999 < 9999999  and function return : %d\n", unbounded_int_cmp_unbounded_int(a,b));
+    printf("    9999999 > 0  and function return : %d\n", unbounded_int_cmp_unbounded_int(b,c));
+    printf("    0 = -0 and function return :  %d\n", unbounded_int_cmp_unbounded_int(c,d));
+
+    printf("Test comparison unbounded_int / long_long with basics values\n");
+    printf("    -9999999 < 9999999  and function return : %d\n", unbounded_int_cmp_ll(a,9999999));
+    printf("    9999999 > 0  and function return : %d\n", unbounded_int_cmp_ll(b,0));
+    printf("    0 = -0 and function return :  %d\n", unbounded_int_cmp_ll(c,-0));
+
+    printf("Test sum unbounded_int with basics values\n");
+    printf( "   -9999999 + 9999999 = 19999998 and function return :\n");
+    unbounded_int somme = unbounded_int_somme(a,b);
+    print_unbounded_int(&somme);
+    printf("   9999999 + 0 = 9999999 and function return :\n");
+    somme = unbounded_int_somme(b,c);
+    print_unbounded_int(&somme);
+    printf( "   0 + -0 = 0 and function return :\n");
+    somme = unbounded_int_somme(c,d);
+    print_unbounded_int(&somme);
+
+    printf("Test difference unbounded_int with basics values\n");
+    printf( "   -9999999 - 9999999 = -19999998 and function return :\n");
+    unbounded_int difference = unbounded_int_difference(a,b);
+    print_unbounded_int(&difference);
+    printf("   9999999 - 0 = 9999999 and function return :\n");
+    difference = unbounded_int_difference(b,c);
+    print_unbounded_int(&difference);
+    printf( "   0 - -0 = 0 and function return :\n");
+    difference = unbounded_int_difference(c,d);
+    print_unbounded_int(&difference);
+
+    printf("Test produit unbounded_int with basics values\n");
+    printf( "   -9999999 * 9999999 = -99999980000001 and function return :\n");
+    unbounded_int produit = unbounded_int_produit(a,b);
+    print_unbounded_int(&produit);
+    printf("   9999999 * 0 = 0 and function return :\n");
+    produit = unbounded_int_produit(b,c);
+    print_unbounded_int(&produit);
+    printf( "   0 * -0 = 0 and function return :\n");
+    produit = unbounded_int_produit(c,d);
+    print_unbounded_int(&produit);
+    printf("\n\n\n");
 }
 
 static void testPrintLong(long long a){
@@ -114,8 +164,6 @@ static void testUIcmpUIandUIcmpll(){
         if(result_unbounded_int_cmp_ll == 0){
             grade_ui_llTrue += 1;
         }
-
-
 
         // test sign unbounded int
         int result_cmp_sign = unbounded_int_cmp_unbounded_int(ui1,ui3);
@@ -298,14 +346,11 @@ for(int i = 0; i < 1000; i++){
 
     }
     */
+    test_specifics_values();
     testS2UI2S();
     testll2UI();
     testUIcmpUIandUIcmpll();
     testSomme();
     testDifference();
     testProduit();
-
-
-
-
 }
