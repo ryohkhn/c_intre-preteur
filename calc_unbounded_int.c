@@ -221,9 +221,6 @@ void effectuerOperation(variable* leftVar,unbounded_int firstVar,char operateur,
         case '*':
             leftVar->valeur= unbounded_int_produit(firstVar,secondVar);
             break;
-        case '/':
-            // pas implémenté
-            break;
         default:
             break;
     }
@@ -290,11 +287,11 @@ void attribuerValeur(char *var, const char *ligne) {
     int tailleFirstVar=0;
     int tailleSecondVar=0;
     int foundFirstSpace=0;
+    int compteur=0;
     char* firstVar=malloc(sizeof(char)*(*tailleFirstMalloc));
     char* secondVar=malloc(sizeof(char)*(*tailleSecondMalloc));
     char operateur=' ';
     char c=*ligne;
-    int compteur=0;
 
     while(c==' '){ // on avance dans la ligne tant qu'il s'agit d'un espace
         compteur++;
@@ -435,6 +432,7 @@ void interpreterLineByLine(FILE *sortie, char *ligne) {
         }
     }
 }
+
 
 void interpreter(FILE* source, FILE* sortie){
     listeVar=malloc(sizeof(variable)*variable_array_allocated_size);

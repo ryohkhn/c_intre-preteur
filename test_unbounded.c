@@ -34,7 +34,7 @@ static void test_specifics_values(){
     printf("    0 = -0 and function return :  %d\n", unbounded_int_cmp_ll(c,-0));
 
     printf("Test sum unbounded_int with basics values\n");
-    printf( "   -9999999 + 9999999 = 19999998 and function return :\n");
+    printf( "   -9999999 + 9999999 = 0 and function return :\n");
     unbounded_int somme = unbounded_int_somme(a,b);
     print_unbounded_int(&somme);
     printf("   9999999 + 0 = 9999999 and function return :\n");
@@ -286,8 +286,8 @@ static void testProduit(){
     int grade = 0;
     for(int i = 0; i < 1000; i++){
         //initialization
-        long long l1 = randomll();
-        long long l2 = randomll();
+        long long l1 = random();
+        long long l2 = random();
         unbounded_int u1 = ll2unbounded_int(l1);
         unbounded_int u2 = ll2unbounded_int(l2);
 
