@@ -2,7 +2,6 @@
 #include <string.h>
 #include "unbounded_int.h"
 
-#include "stdio.h"
 
 unbounded_int string2unbounded_int(const char* e){
     unsigned long stringLen=strlen(e);
@@ -75,7 +74,8 @@ unbounded_int ll2unbounded_int(long long i){
         tmp->precedent = nouveau;
         tmp = nouveau;
         res.len += 1;
-    }while(i /= 10);
+    }
+    while(i /= 10);
     res.premier = tmp;
     return res;
 }
@@ -205,19 +205,20 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     chiffre * nextChiffreA = a.dernier;
     chiffre * nextChiffreB = b.dernier;
     chiffre * nextChiffre = malloc(sizeof(chiffre));
-    nextChiffre->c = ((nextChiffreA->c-'0' + nextChiffreB->c-'0') % 10)+'0';
-    int retenue = (nextChiffreA->c-'0' + nextChiffreB->c-'0')/10;
-    res.dernier = nextChiffre ;
+    chiffre* next;
+    int add=nextChiffreA->c-'0' + nextChiffreB->c-'0';
+    nextChiffre->c = (add % 10)+'0';
+    int retenue = add/10;
+    res.dernier = nextChiffre;
     nextChiffreA = nextChiffreA->precedent;
     nextChiffreB = nextChiffreB->precedent;
-    res.len += 1;
+    res.len+=1;
 
-    // boucle qui compare le chiffre A au B, sur toute la longueur de B
+    // boucle qui compare le chiffre A au B
     while(nextChiffreB != NULL && nextChiffreA != NULL) {
-        chiffre* next = malloc(sizeof(chiffre));
-
-        int add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
-        next->c = add % 10 + '0';
+        next = malloc(sizeof(chiffre));
+        add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
+        next->c = (add % 10)+'0';
         retenue = add / 10;
 
         next->suivant = nextChiffre;
@@ -230,30 +231,37 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
         res.len += 1;
     }
     while(nextChiffreB != NULL){
-        chiffre* next = malloc(sizeof(chiffre));
-        int add = nextChiffreB->c-'0' + retenue;
-        next->c = add % 10+'0';
+        next = malloc(sizeof(chiffre));
+        add = nextChiffreB->c-'0' + retenue;
+        next->c = (add % 10)+'0';
         retenue = add / 10;
 
         next->suivant = nextChiffre;
         nextChiffre->precedent = next;
-        nextChiffre = nextChiffre->precedent;
+        nextChiffre = next;
 
         nextChiffreB = nextChiffreB->precedent;
         res.len += 1;
     }
     while(nextChiffreA != NULL){
-        chiffre* next = malloc(sizeof(chiffre));
-        int add = nextChiffreA->c-'0' + retenue;
+        next = malloc(sizeof(chiffre));
+        add = nextChiffreA->c-'0' + retenue;
         next->c = add % 10+'0';
         retenue = add / 10;
 
         next->suivant = nextChiffre;
         nextChiffre->precedent = next;
-        nextChiffre = nextChiffre->precedent;
+        nextChiffre = next;
 
         nextChiffreA= nextChiffreA->precedent;
         res.len += 1;
+    }
+    if(retenue!=0){
+        next = malloc(sizeof(chiffre));
+        next->c=retenue+'0';
+        next->suivant = nextChiffre;
+        nextChiffre->precedent = next;
+        nextChiffre = next;
     }
     res.premier = nextChiffre;
     return res;
@@ -430,9 +438,9 @@ static unbounded_int produit_simple(unbounded_int a, int value){
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     chiffre * chiffreB = b.dernier;
     int mult = 1;
-    chiffre * chif = malloc(sizeof(chiffre));
-    chif->c = '0';
-    unbounded_int res = {.signe = '+', 1,chif,chif};
+    chiffre * chiffreInitial = malloc(sizeof(chiffre));
+    chiffreInitial->c = '0';
+    unbounded_int res = {.signe = '+', 1,chiffreInitial,chiffreInitial};
     while(chiffreB != NULL){
         int value = (chiffreB->c-'0') * mult;
         unbounded_int res2 = produit_simple(a, value);
