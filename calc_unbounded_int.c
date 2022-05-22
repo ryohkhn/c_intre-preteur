@@ -530,12 +530,12 @@ int main(int argc,char* argv[]){
 
     /* TODO FREE ET FERMER LES FICHIERS A LA FIN DU MAIN ??  --------- fait ------------
      * TODO AJOUTER TESTS ERREUR MALLOC ET REALLOC ---------- fait -----------
-     * TODO PRENDRE DES LIGNES PLUS GRANDE QUE 1024
+     * TODO PRENDRE DES LIGNES PLUS GRANDE QUE 1024 -------- en cours -----------
      * TODO possible d'inverser -i et -o
-     * TODO vérifier que toutes les fonctions auxiliaires sont static
+     * TODO vérifier que toutes les fonctions auxiliaires sont static ------- fait -------
      * TODO RETIRER LES ZEROS INUTILES D'UN UI
      * TODO enlever la première ligne dans le readme pour le rendu
-     * TODO enlever les warnings à la compilation
-     * TODO RETIRER LES TRUCS INUTILES DU MAIN DE TEST
+     * TODO enlever les warnings à la compilation ----- fait -----
+     * TODO RETIRER LES TRUCS INUTILES DU MAIN DE TEST ------- fait -------
      */
 }
