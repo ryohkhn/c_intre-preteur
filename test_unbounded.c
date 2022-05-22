@@ -6,7 +6,7 @@
 // affichage d'un unbounded_int
 static void print_unbounded_int(const unbounded_int* s){
 	printf("%c",s->signe);
-	int i=0;
+	size_t i=0;
 	chiffre* tmp=s->premier;
 	while(i<s->len){
         printf("%c",tmp->c);

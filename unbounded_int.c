@@ -64,6 +64,10 @@ unbounded_int ll2unbounded_int(long long i){
     long long x = i;
     do {
         chiffre* nouveau = malloc(sizeof(chiffre));
+        if(nouveau== NULL){
+            unbounded_int empty = {.signe='*'};
+            return empty;
+        }
         if(x == i){ //first iteration
             res.dernier = nouveau;
         }
@@ -83,6 +87,9 @@ unbounded_int ll2unbounded_int(long long i){
 
 char* unbounded_int2string(unbounded_int i){
     char* res=malloc(sizeof(char)*(i.len+2));
+    if(res== NULL){
+        return "*";
+    }
     *res=i.signe;
     int compt=1;
     chiffre* tmp=i.premier;
@@ -217,6 +224,10 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     chiffre * nextChiffreA = a.dernier;
     chiffre * nextChiffreB = b.dernier;
     chiffre * nextChiffre = malloc(sizeof(chiffre));
+    if(nextChiffre==NULL){
+        unbounded_int empty = {.signe ='*'};
+        return empty;
+    }
     chiffre* next;
     int add=nextChiffreA->c-'0' + nextChiffreB->c-'0';
     nextChiffre->c = (char)((add % 10)+'0');
@@ -229,6 +240,10 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     // boucle qui compare le chiffre A au B
     while(nextChiffreB != NULL && nextChiffreA != NULL) {
         next = malloc(sizeof(chiffre));
+        if(next==NULL){
+            unbounded_int empty = {.signe ='*'};
+            return empty;
+        }
         add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
         next->c = (char)((add % 10)+'0');
         retenue = add / 10;
@@ -244,6 +259,10 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     }
     while(nextChiffreB != NULL){
         next = malloc(sizeof(chiffre));
+        if(next==NULL){
+            unbounded_int empty = {.signe ='*'};
+            return empty;
+        }
         add = nextChiffreB->c-'0' + retenue;
         next->c =(char)((add % 10)+'0');
         retenue = add / 10;
@@ -257,6 +276,10 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     }
     while(nextChiffreA != NULL){
         next = malloc(sizeof(chiffre));
+        if(next==NULL){
+            unbounded_int empty = {.signe ='*'};
+            return empty;
+        }
         add = nextChiffreA->c-'0' + retenue;
         next->c =(char)(( add % 10)+'0');
         retenue = add / 10;
@@ -270,6 +293,10 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     }
     if(retenue!=0){
         next = malloc(sizeof(chiffre));
+        if(next==NULL){
+            unbounded_int empty = {.signe ='*'};
+            return empty;
+        }
         next->c=(char)((retenue)+'0');
         next->suivant = nextChiffre;
         nextChiffre->precedent = next;
@@ -330,6 +357,10 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
         // on se déplace au chiffre précédent seulement si on n'est pas au dernier chiffre de la valeur
         if(count<b.len-1){
             chiffre* next=malloc(sizeof(chiffre));
+            if(next==NULL){
+                unbounded_int empty = {.signe ='*'};
+                return empty;
+            }
             next->suivant=nextChiffre;
             nextChiffre->precedent=next;
             nextChiffre=nextChiffre->precedent;
@@ -344,6 +375,10 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
     // boucle pour compléter le résultat, si A est plus grand que B
     while(nextChiffreA!=NULL){
         chiffre* next=malloc(sizeof(chiffre));
+        if(next==NULL){
+            unbounded_int empty = {.signe ='*'};
+            return empty;
+        }
         if((nextChiffreA->c-'0')+retenue>=0){
             next->c=(char)(((nextChiffreA->c-'0')+retenue)+'0');
             retenue=0;
@@ -429,6 +464,10 @@ static unbounded_int unbounded_int_produit_aux(unbounded_int a, unbounded_int b)
         // ajoute les 0 du décalage à l'UI
         for(int i=0;i<decalage;i++){
             chiffreZero=malloc(sizeof(chiffre));
+            if(chiffreZero==NULL){
+                unbounded_int empty = {.signe ='*'};
+                return empty;
+            }
             chiffreZero->c='0';
             if(tmpRes.len==0){
                 tmpRes.premier=chiffreZero;
@@ -444,6 +483,10 @@ static unbounded_int unbounded_int_produit_aux(unbounded_int a, unbounded_int b)
 
         while(nextChiffreA!=NULL){
             newChiffre=malloc(sizeof(chiffre));
+            if(newChiffre==NULL){
+                unbounded_int empty = {.signe ='*'};
+                return empty;
+            }
             val2=(nextChiffreA->c)-'0';
 
             newChiffre->c=(char)(((val*val2+retenue)%10)+'0');
