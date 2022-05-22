@@ -514,21 +514,21 @@ int main(int argc,char* argv[]){
         if(argc>3 && strcmp(argv[3],"-o")==0){
             fichierSortie=fopen(argv[4],"w");
             interpreter(fichierEntree,fichierSortie);
+            fclose(fichierSortie);
         }
         else{
             interpreter(fichierEntree,stdout);
         }
+        fclose(fichierEntree);
     }
     else if(argc>1 && strcmp(argv[1],"-o")==0){
         fichierSortie=fopen(argv[2],"w");
         interpreter(stdin,fichierSortie);
+        fclose(fichierSortie);
     }
     else{
         interpreter(stdin,stdout);
     }
-
-    fclose(fichierEntree);
-    fclose(fichierSortie);
 
 
     /* TODO FREE ET FERMER LES FICHIERS A LA FIN DU MAIN ??  --------- fait ------------
