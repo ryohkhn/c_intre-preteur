@@ -1,18 +1,21 @@
 CC=gcc
 CFLAGS= -Wall -pedantic -g
-LDLIBS= -lm
 
 
-.PHONY: clean
-run_calc: clean calc_unbounded
+calc_unbounded_int : clean calc_unbounded_int.o unbounded_int.o
+	$(CC) out/calc_unbounded_int.o out/unbounded_int.o -o out/calc_unbounded_int
 
-run_test: clean test_unbounded
+test_unbounded : clean test_unbounded.o unbounded_int.o
+	$(CC) out/test_unbounded.o out/unbounded_int.o -o out/test_unbounded
 
-test_unbounded :
-	$(CC) $(CFLAGS) test_unbounded.c unbounded_int.c -o out/test_unbounded
+calc_unbounded_int.o : calc_unbounded_int.c unbounded_int.h
+	$(CC) $(CFLAGS) -c calc_unbounded_int.c -o out/calc_unbounded_int.o
 
-calc_unbounded :
-	$(CC) $(CFLAGS) calc_unbounded_int.c unbounded_int.c -o out/calc_unbounded_int
+test_unbounded.o : test_unbounded.c unbounded_int.h
+	$(CC) $(CFLAGS) -c test_unbounded.c -o out/test_unbounded.o
+
+unbounded_int.o : unbounded_int.c unbounded_int.h
+	$(CC) $(CFLAGS) -c unbounded_int.c -o out/unbounded_int.o
 
 clean :
 	rm -rdf out/
