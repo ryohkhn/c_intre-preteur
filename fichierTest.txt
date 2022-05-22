@@ -8,4 +8,3 @@ print a
 print b
 c=     a - -565543443423
 print c
-print fkjdlsqjmf

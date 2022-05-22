@@ -193,6 +193,18 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b){
     return 0;
 }
 
+// retirer les 0 inutiles dans un unbounded int
+static unbounded_int unbounded_int_enlever_zeros(unbounded_int a){
+    chiffre* tmp;
+    while(a.len>1 && a.premier->c=='0'){
+        a.len--;
+        tmp=a.premier;
+        a.premier=tmp->suivant;
+        free(tmp);
+    }
+    return a;
+}
+
 // addition de deux unbounded_int positifs
 static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded_int b){
     chiffre * dernier = malloc(sizeof(chiffre));
@@ -264,6 +276,8 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
         nextChiffre = next;
     }
     res.premier = nextChiffre;
+    // on retire les zéros en trop si nécessaire
+    res=unbounded_int_enlever_zeros(res);
     return res;
 }
 
@@ -346,6 +360,8 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
         count++;
     }
     res.premier=nextChiffre;
+    // on retire les zéros en trop si nécessaire
+    res=unbounded_int_enlever_zeros(res);
     return res;
 }
 

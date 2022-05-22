@@ -531,10 +531,4 @@ int main(int argc,char* argv[]){
     else{
         interpreter(stdin,stdout);
     }
-
-
-    /* TODO RETIRER LES ZEROS INUTILES D'UN UI
-     * TODO enlever la première ligne dans le readme pour le rendu
-     * TODO enlever les warnings à la compilation ----- fait -----
-     */
 }
