@@ -21,6 +21,13 @@ void printError(char* errorMessage){
     exit(EXIT_FAILURE);
 }
 
+void testMalloc(void * ptr){
+    if(ptr == NULL){
+        printf("Erreur de malloc() ou realloc().\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
 
 // retourne le pointeur de nom var, ou NULL si inexistante
 variable* getVariable(char* var){
@@ -41,6 +48,7 @@ char* checkStringSize(char* string,int tailleVar,size_t* tailleMalloc){
     if(tailleVar==*(tailleMalloc)){
         *(tailleMalloc)*=2;
         string=realloc(string,sizeof(char)*(*tailleMalloc));
+        testMalloc(string);
     }
     return string;
 }
@@ -50,6 +58,7 @@ char* checkStringSize(char* string,int tailleVar,size_t* tailleMalloc){
 char* reallocToSize(char* string,int tailleString){
     *(string+tailleString)='\0';
     string=realloc(string,sizeof(char)*tailleString);
+    testMalloc(string);
     return string;
 }
 
@@ -59,6 +68,7 @@ void checkArraySize(){
     if(variable_array_allocated_size==variable_array_size){
         variable_array_allocated_size*=2;
         listeVar=realloc(listeVar,sizeof(variable)*variable_array_allocated_size);
+        testMalloc(listeVar);
     }
 }
 
@@ -126,9 +136,7 @@ void checkVariablesAvecOp(char* leftVar,char* firstVar,char operateur,char* seco
         variable* newVar=getVariable(leftVar);
         if(newVar==NULL){
             newVar=malloc(sizeof(variable));
-            if(newVar==NULL){
-                exit(EXIT_FAILURE);
-            }
+            testMalloc(newVar);
             checkArraySize();
             newVar->nom=leftVar;
             *(listeVar+variable_array_size)=*newVar;
@@ -152,9 +160,7 @@ void checkVariablesSansOp(char* leftVar,char* firstVar) {
         variable* newVar=getVariable(leftVar);
         if(newVar==NULL){
             newVar=malloc(sizeof(variable));
-            if(newVar==NULL){
-                exit(EXIT_FAILURE);
-            }
+            testMalloc(newVar);
             checkArraySize();
             newVar->nom=leftVar;
             *(listeVar+variable_array_size)=*newVar;
@@ -167,11 +173,13 @@ void checkVariablesSansOp(char* leftVar,char* firstVar) {
 // récupère la valeur à afficher et l'affiche dans le fichier output, traite les différentes erreurs
 void printValeur(const char *ligne, FILE *output) {
     size_t* tailleMalloc=malloc(sizeof(size_t));
+    testMalloc(tailleMalloc);
     *tailleMalloc=1;
     int tailleVar=0;
     int compteur=0;
     int foundSpace=0;
     char* var=malloc(sizeof(char)*(*(tailleMalloc)));
+    testMalloc(var);
     char c=*ligne;
     char* stringOutput;
     variable* tmpVar;
@@ -215,6 +223,7 @@ void printValeur(const char *ligne, FILE *output) {
     }
     else if(tailleVar!=0){ // on affiche dans le fichier que la variable vaut 0 sinon
         stringOutput=malloc(sizeof(char)* strlen(var)+5);
+        testMalloc(stringOutput);
         // concaténation du string à écrire
         sprintf(stringOutput,"%s = 0\n",var);
         fputs(stringOutput,output);
@@ -292,7 +301,9 @@ void attribuerValeurAvecOp(char* leftVar,char* firstVar,char operateur,char* sec
 // récupère les variables de la ligne, détecte si elle contient une opération ou non
 void attribuerValeur(char *var, const char *ligne) {
     size_t* tailleFirstMalloc=malloc(sizeof(size_t));
+    testMalloc(tailleFirstMalloc);
     size_t* tailleSecondMalloc=malloc(sizeof(size_t));
+    testMalloc(tailleSecondMalloc);
     *tailleFirstMalloc=1;
     *tailleSecondMalloc=1;
     int tailleFirstVar=0;
@@ -300,7 +311,9 @@ void attribuerValeur(char *var, const char *ligne) {
     int foundFirstSpace=0;
     int compteur=0;
     char* firstVar=malloc(sizeof(char)*(*tailleFirstMalloc));
+    testMalloc(firstVar);
     char* secondVar=malloc(sizeof(char)*(*tailleSecondMalloc));
+    testMalloc(secondVar);
     char operateur=' ';
     char c=*ligne;
 
@@ -403,6 +416,7 @@ void interpreterLineByLine(FILE *sortie, char *ligne) {
     int compteur=0;
     int foundSpace=0;
     char* var=malloc(sizeof(char)*(*tailleVarInitiale));
+    testMalloc(var);
     char c=*ligne;
     while (c != EOF && c != '\n' ){ // on itère lettre par lettre jusqu'a reconnaître une variable, un print ou une erreur
         if(tailleVar==0 && c==' '){ // cas des espaces avant la variable
@@ -456,9 +470,24 @@ void interpreterLineByLine(FILE *sortie, char *ligne) {
 
 void interpreter(FILE* source, FILE* sortie){
     listeVar=malloc(sizeof(variable)*variable_array_allocated_size);
-    int taille_max=1024;
-    char* ligne=malloc(sizeof(char)*taille_max);
-    while(fgets(ligne,taille_max,source)!=0){
+    testMalloc(listeVar);
+    int len = 8;
+    char* ligne = malloc(sizeof(char) * len);
+    testMalloc(ligne);
+    char c;
+    int i;
+    while(c != EOF){
+        c = fgetc(source);
+        for(i = 0; (c != '\n' && c != EOF); i++){
+            if(strlen(ligne) >= len - 1){
+                len *= 2;
+                ligne = realloc(ligne,len);
+            }
+            ligne[i] = c;
+            c = fgetc(source);
+        }
+        reallocToSize(ligne,i + 1);
+        printf(" ligne = %s\n", ligne);
         interpreterLineByLine(sortie, ligne);
     }
 }
@@ -495,9 +524,12 @@ int main(int argc,char* argv[]){
         interpreter(stdin,stdout);
     }
 
+    fclose(fichierEntree);
+    fclose(fichierSortie);
 
-    /* TODO FREE ET FERMER LES FICHIERS A LA FIN DU MAIN ??
-     * TODO AJOUTER TESTS ERREUR MALLOC ET REALLOC
+
+    /* TODO FREE ET FERMER LES FICHIERS A LA FIN DU MAIN ??  --------- fait ------------
+     * TODO AJOUTER TESTS ERREUR MALLOC ET REALLOC ---------- fait -----------
      * TODO PRENDRE DES LIGNES PLUS GRANDE QUE 1024
      * TODO possible d'inverser -i et -o
      * TODO vérifier que toutes les fonctions auxiliaires sont static

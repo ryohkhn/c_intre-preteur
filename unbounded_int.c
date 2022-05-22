@@ -397,11 +397,11 @@ static unbounded_int unbounded_int_produit_aux(unbounded_int a, unbounded_int b)
     int val2;
     int decalage=0;
 
-    while(nextChiffreB!=NULL){
-        unbounded_int tmpRes={.signe='+',.len=0};
-        nextChiffreA=a.dernier;
-        retenue=0;
-        val=(nextChiffreB->c)-'0';
+    while (nextChiffreB != NULL) {
+        unbounded_int tmpRes = {.signe='+', .len=0};
+        nextChiffreA = a.dernier;
+        retenue = 0;
+        val = (nextChiffreB->c) - '0';
 
         // si la valeur est à 0 on ne fait pas de mutiplication
         if(val==0){
@@ -442,28 +442,27 @@ static unbounded_int unbounded_int_produit_aux(unbounded_int a, unbounded_int b)
             }
             tmpRes.len++;
 
-            retenue=(val*val2+retenue)/10;
-            nextChiffreA=nextChiffreA->precedent;
+            retenue = (val * val2 + retenue) / 10;
+            nextChiffreA = nextChiffreA->precedent;
         }
 
         // s'il reste une retenue après avoir fait les premières opérations on l'ajoute au bout de l'UI
         if(retenue>0){
             newChiffre= malloc(sizeof(chiffre));
             newChiffre->c=(char)((retenue)+'0');
-            newChiffre->suivant=tmpRes.premier;
-            tmpRes.premier->precedent=newChiffre;
-            tmpRes.premier=newChiffre;
+            newChiffre->suivant = tmpRes.premier;
+            tmpRes.premier->precedent = newChiffre;
+            tmpRes.premier = newChiffre;
             tmpRes.len++;
         }
 
-        if(res.len!=0){
-            res=unbounded_int_somme(res,tmpRes);
-        }
-        else{
-            res=tmpRes;
+        if (res.len != 0) {
+            res = unbounded_int_somme(res, tmpRes);
+        } else {
+            res = tmpRes;
         }
         decalage++;
-        nextChiffreB=nextChiffreB->precedent;
+        nextChiffreB = nextChiffreB->precedent;
     }
     return res;
 }
@@ -492,4 +491,24 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     // cas ou les deux unbounded sont positifs ou les deux sont négatifs
     return unbounded_int_produit_aux(a,b);
 }
+
+/*
+static unbounded_int UI_to_Binary(unbounded_int ui){
+    chiffre * chiffre1 = malloc(sizeof(chiffre));
+    chiffre1->c = '2';
+    unbounded_int multiplieur = {.signe = '+', 1, chiffre1,chiffre1};
+
+    chiffre * chiffre2 = malloc(sizeof(chiffre));
+    chiffre2->c = '1';
+    unbounded_int diviseur_binaire = {.signe = '+', 1, chiffre2,chiffre2};
+    int compteur_puissance = 0;
+
+    while(unbounded_int_cmp_unbounded_int(ui,diviseur_binaire) != -1){
+        diviseur_binaire = unbounded_int_produit(diviseur_binaire,multiplieur);
+        compteur_puissance += 1;
+    }
+    //cas avec 0 ??
+
+ */
+
 
