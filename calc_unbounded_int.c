@@ -472,18 +472,51 @@ void interpreterLineByLine(FILE *sortie, char *ligne) {
 
 
 void interpreter(FILE* source, FILE* sortie){
-    listeVar=malloc(sizeof(variable)*variable_array_allocated_size);
-    testMalloc(listeVar);
-    int len = 8;
     char* ligne;
     char c;
-    int i;
+    int x = 0;
+    int y = 0;
+    printf("test1\n");
+    while(c != EOF){
+        c = fgetc(source);
+        printf("test2\n");
+        while(c != EOF && c != '\n'){
+            y += 1;
+            c = fgetc(source);
+        }
+        printf("test3\n");
+
+        ligne = malloc(sizeof(char) * (y - x + 1));
+        testMalloc(ligne);
+        printf("test4\n");
+
+        fseek(source,x,SEEK_SET);
+        printf("test5\n");
+
+        fread(ligne,sizeof(char),y - x, source);
+        printf("test6\n");
+
+        ligne[y - x] = '\0'; //cas avec une ligne vide = erreur ?
+        printf("test7");
+
+        y += 1;
+        x = y;
+        printf("test8\n");
+        printf("%s\n", ligne);
+        interpreterLineByLine(sortie, ligne);
+        printf("test9\n");
+
+    }
+}
+
+/*
+ int i;
     while(c != EOF){
         ligne=malloc(sizeof(char) * len);
         testMalloc(ligne);
         c = (char)fgetc(source);
         for(i = 0; (c != '\n' && c != EOF); i++){
-            if(strlen(ligne) >= len - 1){
+            if(i >= len - 1){
                 len *= 2;
                 ligne = realloc(ligne,len);
             }
@@ -493,7 +526,7 @@ void interpreter(FILE* source, FILE* sortie){
         ligne=reallocToSize(ligne,i+1);
         interpreterLineByLine(sortie, ligne);
     }
-}
+ */
 
 
 
