@@ -15,12 +15,14 @@ static size_t variable_array_size=1;
 static variable* listeVar;
 
 
+// affiche l'erreur et termine l'exécution avec EXIT_FAILURE
 void printError(char* errorMessage){
     printf("Erreur: %s\n",errorMessage);
     exit(EXIT_FAILURE);
 }
 
 
+// retourne le pointeur de nom var, ou NULL si inexistante
 variable* getVariable(char* var){
     for (int i = 0; i < variable_array_size; i++) {
         if((listeVar+i)->nom!=NULL){
@@ -34,6 +36,7 @@ variable* getVariable(char* var){
 }
 
 
+// double la taille allouée à la variable si nécessaire
 char* checkStringSize(char* string,int tailleVar,size_t* tailleMalloc){
     if(tailleVar==*(tailleMalloc)){
         *(tailleMalloc)*=2;
@@ -51,6 +54,7 @@ char* reallocToSize(char* string,int tailleString){
 }
 
 
+// double ta taille du tableau de variables si nécessaire
 void checkArraySize(){
     if(variable_array_allocated_size==variable_array_size){
         variable_array_allocated_size*=2;
@@ -92,15 +96,16 @@ int stringIsDigit(char* string){
 }
 
 
-// vérifie si la variable string est bien formée que de lettres ou que de chiffres
+// vérifie si la variable string est bien formée seulement de lettres ou de chiffres
 void verifyStringFormat(char* string){
     if(!stringIsAlpha(string) && !stringIsDigit(string)){
-        printError("La variable doit être composée seulement de chiffres ou de lettres");
+        printError("La variable doit être composée seulement de lettres ou de chiffres");
         exit(EXIT_FAILURE);
     }
 }
 
 
+// vérifie que les variables utilisées existent et crée la variable à attribuer si inexistante
 void checkVariablesAvecOp(char* leftVar,char* firstVar,char operateur,char* secondVar) {
     variable* tmpFirstVar;
     variable* tmpSecondVar;
@@ -132,6 +137,8 @@ void checkVariablesAvecOp(char* leftVar,char* firstVar,char operateur,char* seco
     }
 }
 
+
+// vérifie que la variable utilisée existe et crée la variable à attribuer si inexistante
 void checkVariablesSansOp(char* leftVar,char* firstVar) {
     variable* tmpFirstVar;
 
@@ -156,6 +163,8 @@ void checkVariablesSansOp(char* leftVar,char* firstVar) {
     }
 }
 
+
+// récupère la valeur à afficher et l'affiche dans le fichier output, traite les différentes erreurs
 void printValeur(const char *ligne, FILE *output) {
     size_t* tailleMalloc=malloc(sizeof(size_t));
     *tailleMalloc=1;
@@ -167,7 +176,7 @@ void printValeur(const char *ligne, FILE *output) {
     char* stringOutput;
     variable* tmpVar;
 
-    while(c==' '){ // on avance dans la ligne tant qu'il s'agit d'un espace
+    while(c==' '){ // on avance dans la ligne tant que le caractère est un espace
         compteur++;
         c=*(ligne+compteur);
     }
@@ -181,6 +190,7 @@ void printValeur(const char *ligne, FILE *output) {
                 printError("Espace invalide dans le print");
             }
 
+            // agrandissement du string si nécessaire
             var=checkStringSize(var,tailleVar,tailleMalloc);
 
             *(var+tailleVar)=c;
@@ -199,17 +209,20 @@ void printValeur(const char *ligne, FILE *output) {
     if(tmpVar!=NULL){ // cas ou la variable existe
         char* tmpVarValeur=unbounded_int2string(tmpVar->valeur);
         stringOutput=malloc(sizeof(char)*(strlen(tmpVarValeur)+strlen(tmpVar->nom)+4));
+        // concaténation du string à écrire
         sprintf(stringOutput,"%s = %s\n",var,tmpVarValeur);
         fputs(stringOutput,output);
     }
     else if(tailleVar!=0){ // on affiche dans le fichier que la variable vaut 0 sinon
         stringOutput=malloc(sizeof(char)* strlen(var)+5);
+        // concaténation du string à écrire
         sprintf(stringOutput,"%s = 0\n",var);
         fputs(stringOutput,output);
     }
 }
 
 
+// appelle les fonctions dépendant de l'opérateur et change la valeur de la variable leftVar
 void effectuerOperation(variable* leftVar,unbounded_int firstVar,char operateur,unbounded_int secondVar){
     switch (operateur) {
         case '+':
@@ -227,18 +240,14 @@ void effectuerOperation(variable* leftVar,unbounded_int firstVar,char operateur,
 }
 
 
+// détecte si rightVar est un nombre ou une variable et attribue sa valeur à leftVar
 void attribuerValeurSansOp(char* leftVar,char* rightVar){
     variable* tmpLeftVar=getVariable(leftVar);
     variable* tmpRightVar;
 
     if(isalpha(*rightVar)){ // variable n'est pas un nombre
         tmpRightVar=getVariable(rightVar);
-        if(tmpRightVar!=NULL){
-            tmpLeftVar->valeur=tmpRightVar->valeur;
-        }
-        else{
-            printError("Variable inexistante");
-        }
+        tmpLeftVar->valeur=tmpRightVar->valeur;
     }
     else{ // variable est un nombre
         unbounded_int rightVarUI=string2unbounded_int(rightVar);
@@ -247,6 +256,7 @@ void attribuerValeurSansOp(char* leftVar,char* rightVar){
 }
 
 
+// détecte si firstVar et secondVar sont des nombres ou des variables pour effectuer l'opération
 void attribuerValeurAvecOp(char* leftVar,char* firstVar,char operateur,char* secondVar){
     variable* tmpLeftVar=getVariable(leftVar);
     variable* tmpFirstVar;
@@ -279,6 +289,7 @@ void attribuerValeurAvecOp(char* leftVar,char* firstVar,char operateur,char* sec
 }
 
 
+// récupère les variables de la ligne, détecte si elle contient une opération ou non
 void attribuerValeur(char *var, const char *ligne) {
     size_t* tailleFirstMalloc=malloc(sizeof(size_t));
     size_t* tailleSecondMalloc=malloc(sizeof(size_t));
@@ -302,26 +313,28 @@ void attribuerValeur(char *var, const char *ligne) {
         if(c==' '){ // cas d'un espace dans la ligne
             foundFirstSpace=1;
         }
-        else if(c=='+' || c=='-' || c=='*' || c=='/') {
+        else if(c=='+' || c=='-' || c=='*' || c=='/') { // cas d'un opérateur
             if (*(ligne + compteur + 1) >= '0' && *(ligne + compteur + 1) <= '9' && (c=='+' || c=='-')){ // cas d'un entier signé
                 if(operateur==' '){
+                    // on vérifie la taille allouée du string
                     firstVar=checkStringSize(firstVar,tailleFirstVar,tailleFirstMalloc);
                     *(firstVar+tailleFirstVar)=c;
                     tailleFirstVar++;
                 }
                 else{
+                    // on vérifie la taille allouée du string
                     secondVar=checkStringSize(secondVar,tailleSecondVar,tailleSecondMalloc);
                     *(secondVar+tailleSecondVar)=c;
                     tailleSecondVar++;
                 }
             }
-            else if(foundFirstSpace==0) {
+            else if(foundFirstSpace==0){ // vérifie que l'opérateur se trouve après une variable
                 printError("Première variable manquante ou espace manquant autour de l'opérateur");
             }
-            else if (*(ligne + compteur - 1) != ' ' || *(ligne + compteur + 1) != ' ') {
+            else if (*(ligne + compteur - 1) != ' ' || *(ligne + compteur + 1) != ' '){ // vérifie les espaces autout de l'opérateur
                 printError("Espace manquant autour de l'opérateur, seconde variable manquante ou mauvais caractère");
             }
-            else if (operateur != ' ') {
+            else if (operateur != ' '){ // vérifie qu'il n'y a qu'un seul opérateur
                 printError("Un seul opérateur est requis");
             }
             else {
@@ -330,7 +343,8 @@ void attribuerValeur(char *var, const char *ligne) {
             }
         }
         else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || isdigit(c)) { // cas d'une lettre dans la variable
-            if (operateur==' ' && foundFirstSpace) { // si un espace a déjà été trouvé après un caractère, à l'encontre d'un nouveau caractère on provoque une erreur
+            // si un espace a déjà été trouvé après un caractère, à l'encontre d'un nouveau caractère on provoque une erreur
+            if (operateur==' ' && foundFirstSpace) {
                 printError("Opérateur manquant");
             }
 
@@ -351,22 +365,28 @@ void attribuerValeur(char *var, const char *ligne) {
         c=*(ligne+compteur);
     }
 
-    if(tailleSecondVar==0 && operateur!=' '){
+    if(tailleSecondVar==0 && operateur!=' '){ // si il y a un opérateur sans seconde variable on provoque une erreur
         printError("Seconde variable manquante");
     }
 
     if(tailleFirstVar!=0){
         if(tailleSecondVar!=0){
+            // realloc des strings à leur taille réelle
             secondVar=reallocToSize(secondVar,tailleSecondVar);
             firstVar=reallocToSize(firstVar,tailleFirstVar);
+            // vérification du format du string, composé seulement de lettres ou de chiffre
             verifyStringFormat(firstVar);
             verifyStringFormat(secondVar);
+            // vérifie que les variables existent avant d'appeler les opérations
             checkVariablesAvecOp(var,firstVar,operateur,secondVar);
             attribuerValeurAvecOp(var,firstVar,operateur,secondVar);
         }
         else{
+            // realloc des strings à leur taille réelle
             firstVar=reallocToSize(firstVar,tailleFirstVar);
+            // vérification du format du string, composé seulement de lettres ou seulement de chiffre
             verifyStringFormat(firstVar);
+            // vérifie que la variable existe avant d'appeler les opérations
             checkVariablesSansOp(var,firstVar);
             attribuerValeurSansOp(var,firstVar);
         }
@@ -375,23 +395,22 @@ void attribuerValeur(char *var, const char *ligne) {
 
 
 
+// traite la ligne pour savoir s'il s'agit d'un print ou d'une attribution, traite les erreurs de la ligne
 void interpreterLineByLine(FILE *sortie, char *ligne) {
     int tailleVar= 0;
-    int tailleVarInitiale=5;
+    size_t* tailleVarInitiale= malloc(sizeof(size_t));
+    *tailleVarInitiale=5;
     int compteur=0;
     int foundSpace=0;
-    char* var=malloc(sizeof(char)*tailleVarInitiale);
+    char* var=malloc(sizeof(char)*(*tailleVarInitiale));
     char c=*ligne;
-    while (c != EOF && c != '\n' ){ // on itere lettre par lettre jusqu'a reconnaitre une variable, un print ou une erreur.
-        if(tailleVar==0 && c==' '){ // cas des escapes avant la variable
+    while (c != EOF && c != '\n' ){ // on itère lettre par lettre jusqu'a reconnaître une variable, un print ou une erreur
+        if(tailleVar==0 && c==' '){ // cas des espaces avant la variable
             compteur++;
             c=*(ligne+compteur);
         }
         else{
-            if(tailleVar==tailleVarInitiale){
-                tailleVarInitiale*=2;
-                var=realloc(var,sizeof(char)*tailleVarInitiale);
-            }
+            // vérification de la taille de la var
             if(tailleVar==0) { // cas de la premiere lettre
                 if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')){
                     *var=c;
@@ -405,6 +424,7 @@ void interpreterLineByLine(FILE *sortie, char *ligne) {
                 if(foundSpace){
                     printError("Espace invalide");
                 }
+                checkStringSize(var,tailleVar,tailleVarInitiale);
                 *(var+tailleVar)=c;
                 tailleVar++;
             }
@@ -480,5 +500,9 @@ int main(int argc,char* argv[]){
      * TODO AJOUTER TESTS ERREUR MALLOC ET REALLOC
      * TODO PRENDRE DES LIGNES PLUS GRANDE QUE 1024
      * TODO possible d'inverser -i et -o
+     * TODO vérifier que toutes les fonctions auxiliaires sont static
+     * TODO RETIRER LES ZEROS INUTILES D'UN UI
+     * TODO enlever la première ligne dans le readme pour le rendu
+     * TODO enlever les warnings à la compilation
      */
 }

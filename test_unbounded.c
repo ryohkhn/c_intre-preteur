@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include "unbounded_int.c"
 
 static void print_unbounded_int(const unbounded_int* s){

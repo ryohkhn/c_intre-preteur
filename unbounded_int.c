@@ -70,7 +70,7 @@ unbounded_int ll2unbounded_int(long long i){
         else{
             nouveau->suivant = tmp;
         }
-        nouveau->c = i%10+'0';
+        nouveau->c =(char)((i%10)+'0');
         tmp->precedent = nouveau;
         tmp = nouveau;
         res.len += 1;
@@ -207,7 +207,7 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     chiffre * nextChiffre = malloc(sizeof(chiffre));
     chiffre* next;
     int add=nextChiffreA->c-'0' + nextChiffreB->c-'0';
-    nextChiffre->c = (add % 10)+'0';
+    nextChiffre->c = (char)((add % 10)+'0');
     int retenue = add/10;
     res.dernier = nextChiffre;
     nextChiffreA = nextChiffreA->precedent;
@@ -218,7 +218,7 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     while(nextChiffreB != NULL && nextChiffreA != NULL) {
         next = malloc(sizeof(chiffre));
         add = nextChiffreA->c-'0' + nextChiffreB->c-'0' + retenue;
-        next->c = (add % 10)+'0';
+        next->c = (char)((add % 10)+'0');
         retenue = add / 10;
 
         next->suivant = nextChiffre;
@@ -233,7 +233,7 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     while(nextChiffreB != NULL){
         next = malloc(sizeof(chiffre));
         add = nextChiffreB->c-'0' + retenue;
-        next->c = (add % 10)+'0';
+        next->c =(char)((add % 10)+'0');
         retenue = add / 10;
 
         next->suivant = nextChiffre;
@@ -246,7 +246,7 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     while(nextChiffreA != NULL){
         next = malloc(sizeof(chiffre));
         add = nextChiffreA->c-'0' + retenue;
-        next->c = add % 10+'0';
+        next->c =(char)(( add % 10)+'0');
         retenue = add / 10;
 
         next->suivant = nextChiffre;
@@ -258,7 +258,7 @@ static unbounded_int unbounded_int_somme_a_b_positifs(unbounded_int a, unbounded
     }
     if(retenue!=0){
         next = malloc(sizeof(chiffre));
-        next->c=retenue+'0';
+        next->c=(char)((retenue)+'0');
         next->suivant = nextChiffre;
         nextChiffre->precedent = next;
         nextChiffre = next;
@@ -306,11 +306,11 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
     // boucle qui compare le chiffre A au B, sur toute la longueur de B
     while(nextChiffreB!=NULL){
         if((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue>=0){
-            nextChiffre->c=((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue)+'0';
+            nextChiffre->c=(char)(((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue)+'0');
             retenue=0;
         }
         else{
-            nextChiffre->c=((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue+10)+'0';
+            nextChiffre->c=(char)(((nextChiffreA->c-'0')-(nextChiffreB->c-'0')+retenue+10)+'0');
             retenue=-1;
         }
         // on se déplace au chiffre précédent seulement si on n'est pas au dernier chiffre de la valeur
@@ -331,11 +331,11 @@ static unbounded_int unbounded_int_difference_a_b_positifs(unbounded_int a, unbo
     while(nextChiffreA!=NULL){
         chiffre* next=malloc(sizeof(chiffre));
         if((nextChiffreA->c-'0')+retenue>=0){
-            next->c=((nextChiffreA->c-'0')+retenue)+'0';
+            next->c=(char)(((nextChiffreA->c-'0')+retenue)+'0');
             retenue=0;
         }
         else{
-            next->c=((nextChiffreA->c-'0')+retenue+10)+'0';
+            next->c=(char)(((nextChiffreA->c-'0')+retenue+10)+'0');
             retenue=-1;
         }
         next->suivant=nextChiffre;
@@ -430,7 +430,7 @@ static unbounded_int unbounded_int_produit_aux(unbounded_int a, unbounded_int b)
             newChiffre=malloc(sizeof(chiffre));
             val2=(nextChiffreA->c)-'0';
 
-            newChiffre->c=((val*val2+retenue)%10)+'0';
+            newChiffre->c=(char)(((val*val2+retenue)%10)+'0');
             if(tmpRes.len==0){
                 tmpRes.premier=newChiffre;
                 tmpRes.dernier=newChiffre;
@@ -449,7 +449,7 @@ static unbounded_int unbounded_int_produit_aux(unbounded_int a, unbounded_int b)
         // s'il reste une retenue après avoir fait les premières opérations on l'ajoute au bout de l'UI
         if(retenue>0){
             newChiffre= malloc(sizeof(chiffre));
-            newChiffre->c=retenue+'0';
+            newChiffre->c=(char)((retenue)+'0');
             newChiffre->suivant=tmpRes.premier;
             tmpRes.premier->precedent=newChiffre;
             tmpRes.premier=newChiffre;
