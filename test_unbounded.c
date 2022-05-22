@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "unbounded_int.c"
+#include <string.h>
+#include "unbounded_int.h"
 
 static void print_unbounded_int(const unbounded_int* s){
 	printf("%c",s->signe);
@@ -65,23 +66,6 @@ static void test_specifics_values(){
     produit = unbounded_int_produit(c,d);
     print_unbounded_int(&produit);
     printf("\n\n\n");
-}
-
-static void testPrintLong(long long a){
-	long long copy=a;
-	unsigned int ret=1;
-	while (copy/=10) ret++;
-	long long tab[ret];
-	while(ret--){
-		tab[ret]=a%10;
-		a/=10;
-	}
-	int j=0;
-	while(j<sizeof(tab)/ sizeof(tab[0])){
-		printf("%lld",*(tab+j));
-		j++;
-	}
-    printf("\n");
 }
 
 static long long randomll(){

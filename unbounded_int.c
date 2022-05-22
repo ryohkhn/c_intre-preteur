@@ -482,9 +482,6 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     if(b.signe=='*'){
         return a;
     }
-    if((a.signe=='+' && b.signe=='+') || (a.signe=='-' && b.signe=='-')){
-        return unbounded_int_produit_aux(a,b);
-    }
     if((a.signe=='+' && b.signe=='-') || (a.signe=='-' && b.signe=='+')){
         unbounded_int res=unbounded_int_produit_aux(a,b);
         if(unbounded_int_cmp_ll(res,0)!=0){
@@ -492,5 +489,7 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
         }
         return res;
     }
+    // cas ou les deux unbounded sont positifs ou les deux sont négatifs
+    return unbounded_int_produit_aux(a,b);
 }
 

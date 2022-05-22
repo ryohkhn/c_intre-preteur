@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "unbounded_int.c"
+#include "unbounded_int.h"
 
 
 typedef struct variable{
@@ -504,5 +504,6 @@ int main(int argc,char* argv[]){
      * TODO RETIRER LES ZEROS INUTILES D'UN UI
      * TODO enlever la première ligne dans le readme pour le rendu
      * TODO enlever les warnings à la compilation
+     * TODO RETIRER LES TRUCS INUTILES DU MAIN DE TEST
      */
 }
