@@ -498,8 +498,7 @@ void interpreter(FILE* source, FILE* sortie){
 
         ligne[y - x] = '\0'; //cas avec une ligne vide = erreur ?
         printf("test7");
-
-        y += 1;
+        
         x = y;
         printf("test8\n");
         printf("%s\n", ligne);
