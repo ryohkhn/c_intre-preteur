@@ -189,7 +189,7 @@ void printValeur(const char *ligne, FILE *output) {
         c=*(ligne+compteur);
     }
 
-    while(c!=EOF && c!='\n'){
+    while(c!=EOF && c!='\n' && c!='\0'){
         if(c==' '){ // cas d'un espace dans la ligne
             foundSpace=1;
         }
@@ -322,7 +322,7 @@ void attribuerValeur(char *var, const char *ligne) {
         c=*(ligne+compteur);
     }
 
-    while(c!=EOF && c!='\n'){
+    while(c!=EOF && c!='\n' && c!='\0'){
         if(c==' '){ // cas d'un espace dans la ligne
             foundFirstSpace=1;
         }
@@ -374,6 +374,9 @@ void attribuerValeur(char *var, const char *ligne) {
                 tailleSecondVar++;
             }
         }
+        else{
+            printError("Caractère invalide");
+        }
         compteur++;
         c=*(ligne+compteur);
     }
@@ -418,7 +421,7 @@ void interpreterLineByLine(FILE *sortie, char *ligne) {
     char* var=malloc(sizeof(char)*(*tailleVarInitiale));
     testMalloc(var);
     char c=*ligne;
-    while (c != EOF && c != '\n' ){ // on itère lettre par lettre jusqu'a reconnaître une variable, un print ou une erreur
+    while (c != EOF && c != '\n' && c!='\0' ){ // on itère lettre par lettre jusqu'a reconnaître une variable, un print ou une erreur
         if(tailleVar==0 && c==' '){ // cas des espaces avant la variable
             compteur++;
             c=*(ligne+compteur);
@@ -472,22 +475,22 @@ void interpreter(FILE* source, FILE* sortie){
     listeVar=malloc(sizeof(variable)*variable_array_allocated_size);
     testMalloc(listeVar);
     int len = 8;
-    char* ligne = malloc(sizeof(char) * len);
-    testMalloc(ligne);
+    char* ligne;
     char c;
     int i;
     while(c != EOF){
-        c = fgetc(source);
+        ligne=malloc(sizeof(char) * len);
+        testMalloc(ligne);
+        c = (char)fgetc(source);
         for(i = 0; (c != '\n' && c != EOF); i++){
             if(strlen(ligne) >= len - 1){
                 len *= 2;
                 ligne = realloc(ligne,len);
             }
             ligne[i] = c;
-            c = fgetc(source);
+            c = (char)fgetc(source);
         }
-        reallocToSize(ligne,i + 1);
-        printf(" ligne = %s\n", ligne);
+        ligne=reallocToSize(ligne,i+1);
         interpreterLineByLine(sortie, ligne);
     }
 }
