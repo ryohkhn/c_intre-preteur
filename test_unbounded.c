@@ -3,6 +3,7 @@
 #include <string.h>
 #include "unbounded_int.h"
 
+// affichage d'un unbounded_int
 static void print_unbounded_int(const unbounded_int* s){
 	printf("%c",s->signe);
 	int i=0;
@@ -16,7 +17,7 @@ static void print_unbounded_int(const unbounded_int* s){
 	}
     printf("\n");
 }
-
+// Il s'agit de tests avec des valeurs spéciales : négatives, positives, 0 et aussi -0 (ce qui ne change rien avec 0)
 static void test_specifics_values(){
     unbounded_int a = string2unbounded_int("-9999999");
     unbounded_int b = string2unbounded_int("9999999");
@@ -68,6 +69,7 @@ static void test_specifics_values(){
     printf("\n\n\n");
 }
 
+// return un long long aléatoire (positifs ou négatif, d'une longueur entre 1 et 19 chiffres)
 static long long randomll(){
     int length = (random() % 18) + 1;
     long long r = ((long long)random() << 25) + random();
@@ -77,6 +79,7 @@ static long long randomll(){
     return r;
 }
 
+// return un string représentant un randomll (fonction d'au dessus)
 static char* randomString(){
     long long r = randomll();
     char * randomString = malloc(sizeof(char) * 20);
@@ -88,6 +91,7 @@ static char* randomString(){
     return randomString;
 }
 
+// test aléatoire de transformation d'un string en unbounded_int en string
 static void testS2UI2S(){
     int grade = 0;
     for(int j = 1; j <= 1000; j++){
@@ -102,6 +106,7 @@ static void testS2UI2S(){
     printf("test String to unbounded_int to String : grade of %d / 1000 \n", grade);
 }
 
+// test aléatoire de transformation d'un long long en unbounded_int
 static void testll2UI(){
     int grade = 0;
     for(int j = 1; j <= 1000; j++){
@@ -116,6 +121,7 @@ static void testll2UI(){
     printf("test long long to unbounded_int : grade of %d / 1000 \n", grade);
 }
 
+// test aléatoire de la comparaison entre deux unbounded_int ainsi qu'entre un unbounded_int et un long long
 static void testUIcmpUIandUIcmpll(){
     int gradeTrue = 0;
     int gradeFalse = 0;
@@ -174,8 +180,6 @@ static void testUIcmpUIandUIcmpll(){
         }
 
 
-
-
         // test non equals unbounded int
         int result_cmp_ui_ui = unbounded_int_cmp_unbounded_int(ui1,ui4);
         if(result_cmp_ui_ui != 0){
@@ -216,6 +220,7 @@ static void testUIcmpUIandUIcmpll(){
             ,grade_ui_llTrue,grade_ui_llSign,grade_ui_llFalse);
 }
 
+// test de la somme avec des valeurs aléatoires
 static void testSomme(){
     int grade = 0;
     for(int i = 0; i < 1000; i++){
@@ -241,6 +246,7 @@ static void testSomme(){
 
 }
 
+// test de la difference avec des valeurs aléatoires
 static void testDifference(){
     int grade = 0;
     for(int i = 0; i < 1000; i++){
@@ -265,6 +271,7 @@ static void testDifference(){
 
 }
 
+// test du produit avec des valeurs aléatoires
 static void testProduit(){
     int grade = 0;
     for(int i = 0; i < 1000; i++){

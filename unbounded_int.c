@@ -508,23 +508,4 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     return unbounded_int_produit_aux(a,b);
 }
 
-/*
-static unbounded_int UI_to_Binary(unbounded_int ui){
-    chiffre * chiffre1 = malloc(sizeof(chiffre));
-    chiffre1->c = '2';
-    unbounded_int multiplieur = {.signe = '+', 1, chiffre1,chiffre1};
-
-    chiffre * chiffre2 = malloc(sizeof(chiffre));
-    chiffre2->c = '1';
-    unbounded_int diviseur_binaire = {.signe = '+', 1, chiffre2,chiffre2};
-    int compteur_puissance = 0;
-
-    while(unbounded_int_cmp_unbounded_int(ui,diviseur_binaire) != -1){
-        diviseur_binaire = unbounded_int_produit(diviseur_binaire,multiplieur);
-        compteur_puissance += 1;
-    }
-    //cas avec 0 ??
-
- */
-
 
